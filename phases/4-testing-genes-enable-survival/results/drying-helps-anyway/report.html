@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dry run: Drying protects, but the gene is not why</title>
+<style>
+  /* Light is the base. Every colour is a token so both themes stay a set. */
+  :root{
+    --bg:#FBFAF7; --surface:#FFFFFF; --sunken:#F4F1EA;
+    --ink:#1B1A17; --ink-2:#4A4740; --ink-3:#7C776C;
+    --rule:#E2DDD1; --rule-2:#CFC8B8;
+    --g1:#E5DBCA; --g2:#F3D6A2; --g3:#A9D9C0; --g4:#BBD6EE; --g5:#CAC4EC;
+    --e1:#A8977A; --e2:#C98A1E; --e3:#218A61; --e4:#4E85B8; --e5:#6F63C4;
+    --good:#1C6B4A; --warn:#B5651D; --bad:#A33A2A; --flat:#7C776C;
+    --shadow:0 1px 2px rgba(27,26,23,.06),0 4px 14px rgba(27,26,23,.05);
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#14161A; --surface:#1B1E24; --sunken:#22262E;
+      --ink:#F2EFE8; --ink-2:#BFBAAF; --ink-3:#8B867B;
+      --rule:#2E333C; --rule-2:#3D434E;
+      --g1:#6E6555; --g2:#8C6C36; --g3:#3B6E58; --g4:#455F7C; --g5:#585177;
+      --e1:#B3A489; --e2:#E0A448; --e3:#5FBE94; --e4:#7FADD9; --e5:#9A8FE0;
+      --good:#3E9E71; --warn:#E9A23C; --bad:#E0705C; --flat:#8B867B;
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 16px rgba(0,0,0,.3);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#14161A; --surface:#1B1E24; --sunken:#22262E;
+    --ink:#F2EFE8; --ink-2:#BFBAAF; --ink-3:#8B867B;
+    --rule:#2E333C; --rule-2:#3D434E;
+    --g1:#6E6555; --g2:#8C6C36; --g3:#3B6E58; --g4:#455F7C; --g5:#585177;
+    --e1:#B3A489; --e2:#E0A448; --e3:#5FBE94; --e4:#7FADD9; --e5:#9A8FE0;
+    --good:#3E9E71; --warn:#E9A23C; --bad:#E0705C; --flat:#8B867B;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 16px rgba(0,0,0,.3);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font:16px/1.6 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* The page fills the screen and so does the text. Nothing is capped to a
+     column width -- a sentence runs the width of the window and wraps only
+     when it actually reaches the edge. */
+  .wrap{width:100%;margin:0;padding:36px clamp(20px,4vw,64px) 88px}
+  header{border-bottom:2px solid var(--ink);padding-bottom:20px;margin-bottom:8px}
+  .eyebrow{
+    font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ink-3);font-weight:650;margin:0 0 8px
+  }
+  h1{font-size:clamp(30px,4vw,50px);line-height:1.1;margin:0 0 12px;
+     letter-spacing:-.02em}
+  .sub{color:var(--ink-2);margin:0;font-size:17.5px}
+  .stamp{color:var(--ink-3);font-size:13px;margin-top:14px}
+  h2{font-size:25px;margin:52px 0 6px;letter-spacing:-.01em}
+  h2 + .lede{color:var(--ink-2);margin:0 0 20px}
+  h3{font-size:17px;margin:26px 0 8px}
+  p{margin:0 0 12px}
+  a{color:inherit;text-underline-offset:2px}
+  /* ---- verdict cards ---------------------------------------------- */
+  .cards{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));margin:18px 0 0}
+  .card{
+    background:var(--surface);border:1px solid var(--rule);border-radius:12px;
+    padding:18px 20px;box-shadow:var(--shadow);border-top:4px solid var(--flat)
+  }
+  .card.yes{border-top-color:var(--good)} .card.no{border-top-color:var(--bad)}
+  .card.partial{border-top-color:var(--warn)}
+  .card.na{border-top-color:var(--rule-2)}
+  .card.na .call{color:var(--ink-3)}
+  .card h3{margin:0 0 4px;font-size:15px;color:var(--ink-3);
+           letter-spacing:.06em;text-transform:uppercase}
+  .card .call{font-size:20px;font-weight:680;margin:2px 0 8px;letter-spacing:-.01em}
+  .card.yes .call{color:var(--good)} .card.no .call{color:var(--bad)}
+  .card.partial .call{color:var(--warn)}
+  .card p{margin:0;font-size:14.5px;color:var(--ink-2)}
+  .card p b{color:var(--ink)}
+  /* the dust -> soil ruler, with this run's mark on it */
+  .ruler{margin:2px 0 12px}
+  .ruler .track{position:relative;height:9px;border-radius:99px;
+                background:var(--g1);border:1px solid var(--rule-2)}
+  .ruler .fill{position:absolute;inset:0 auto 0 0;border-radius:99px;
+               background:var(--g3)}
+  .ruler .pin{position:absolute;top:50%;width:3px;height:19px;border-radius:2px;
+              background:var(--ink);transform:translate(-50%,-50%)}
+  .ruler .ends{display:flex;justify-content:space-between;margin-top:7px;
+               font-size:11.5px;line-height:1.35;color:var(--ink-3)}
+  .ruler .ends span:last-child{text-align:right}
+  /* ---- figures ----------------------------------------------------- */
+  figure{margin:22px 0 0;background:var(--surface);border:1px solid var(--rule);
+         border-radius:12px;padding:20px 20px 14px;box-shadow:var(--shadow)}
+  figure .cap{font-size:14px;color:var(--ink-2);margin:12px 0 0}
+  figure .what{font-size:13.5px;color:var(--ink-3);margin:0 0 10px}
+  .chart-scroll{overflow-x:auto}
+  svg{display:block;max-width:100%;height:auto}
+  .legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin:0 0 14px;
+          font-size:13.5px;color:var(--ink-2)}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+  .swatch{width:13px;height:13px;border-radius:4px;border:2px solid var(--rule-2);
+          display:inline-block;flex:none}
+  .grid2{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(440px,1fr))}
+  /* ---- tables ------------------------------------------------------ */
+  .tw{overflow-x:auto;margin:16px 0 0;border:1px solid var(--rule);
+      border-radius:12px;background:var(--surface);box-shadow:var(--shadow)}
+  .tw + .cap{margin:16px 0 0;font-size:14px;color:var(--ink-2)}
+  .tw:last-child{margin-bottom:8px}
+  table{border-collapse:collapse;width:100%;font-size:14.5px}
+  th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--rule)}
+  thead th{background:var(--sunken);font-size:12px;letter-spacing:.07em;
+           text-transform:uppercase;color:var(--ink-3);white-space:nowrap}
+  tbody tr:last-child td{border-bottom:none}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+  .tag{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;
+       font-weight:640;letter-spacing:.02em;white-space:nowrap}
+  .tag.yes{background:color-mix(in srgb,var(--good) 16%,transparent);color:var(--good)}
+  .tag.no{background:color-mix(in srgb,var(--bad) 16%,transparent);color:var(--bad)}
+  .tag.partial{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
+  .tag.flat,.tag.na{background:var(--sunken);color:var(--ink-3)}
+  .dot{width:9px;height:9px;border-radius:3px;display:inline-block;margin-right:7px;
+       border:2px solid var(--rule-2);vertical-align:-1px}
+  /* ---- the full-data grid ------------------------------------------
+     Nine columns will not fit any screen, so: the headers wrap instead of
+     forcing the columns wide, the numbers get tight columns, and the group
+     name stays pinned to the left while the rest scrolls under it. */
+  table.grid{font-size:13.5px}
+  table.grid th,table.grid td{padding:8px 10px}
+  table.grid thead th{white-space:normal;vertical-align:bottom;
+                      max-width:104px;line-height:1.3}
+  table.grid tbody td{white-space:nowrap}
+  table.grid th:first-child,table.grid td:first-child{
+    position:sticky;left:0;z-index:2;white-space:nowrap;
+    box-shadow:1px 0 0 var(--rule-2)}
+  table.grid thead th:first-child{background:var(--sunken);z-index:3}
+  table.grid tbody td:first-child{background:var(--surface)}
+  table.grid tbody td:first-child.best{
+    background:color-mix(in srgb,var(--g3) 42%,var(--surface))}
+  table.grid tr.ref td:first-child{background:var(--sunken)}
+  table.grid td.best{background:color-mix(in srgb,var(--g3) 42%,transparent);
+                     font-weight:680;color:var(--ink)}
+  /* rounded ends, so the band reads as one stripe */
+  table.grid tbody td:first-child.best{border-radius:7px 0 0 7px}
+  table.grid tbody td.best:last-child{border-radius:0 7px 7px 0}
+  table.grid tr.ref td{color:var(--ink-3)}
+  table.grid tr.ref{background:var(--sunken)}
+  /* ---- notes ------------------------------------------------------- */
+  .note{background:var(--sunken);border-left:3px solid var(--rule-2);
+        border-radius:0 8px 8px 0;padding:16px 20px;margin:18px 0 0;
+        font-size:15px;color:var(--ink-2)}
+  .note p:last-child{margin-bottom:0}
+  .note b{color:var(--ink)}
+  .note.warn{border-left-color:var(--warn)}
+  code{font:13.5px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;
+       background:var(--sunken);padding:1px 6px;border-radius:5px}
+  /* the page just stopped before; this says it meant to */
+  .end{display:flex;align-items:center;gap:16px;margin:64px 0 0;
+       color:var(--ink-3)}
+  .end::before,.end::after{content:"";flex:1;height:1px;background:var(--rule)}
+  .end span{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;
+            font-weight:600;white-space:nowrap}
+  @media (prefers-reduced-motion:no-preference){
+    .card,figure{transition:box-shadow .18s ease}
+  }
+  /* ---- the two chrome buttons -------------------------------------- */
+  .chip{
+    display:inline-flex;align-items:center;gap:8px;cursor:pointer;
+    background:var(--surface);color:var(--ink-2);
+    border:1px solid var(--rule-2);border-radius:99px;
+    padding:9px 14px;font:inherit;font-size:13.5px;font-weight:600;
+    box-shadow:var(--shadow);line-height:1;
+  }
+  .chip:hover{color:var(--ink);border-color:var(--ink-3)}
+  .chip:focus-visible{outline:2px solid var(--ink-3);outline-offset:2px}
+  .chip svg{width:16px;height:16px;fill:currentColor;flex:none}
+  #themeBtn{position:fixed;top:18px;right:18px;z-index:40;padding:10px}
+  #fullscreenBtn{position:fixed;bottom:18px;right:18px;z-index:40}
+  #fullscreenBtn[data-fullscreen] .fs-label{display:none}
+  @media print{.chip{display:none}}
+</style>
+</head>
+<body>
+<button id="themeBtn" class="chip" type="button" aria-label="Switch theme"></button>
+<button id="fullscreenBtn" class="chip" type="button" title="Full screen"></button>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">MarsWorm · Stage 4 · Testing Genes Enable Survival</p>
+    <h1>Dry run: Drying protects, but the gene is not why</h1>
+    <p class="sub">16 conditions × 3 runs, about 50 worms on every plate. Every figure is worked out from two counts per plate: how many went on, and how many were alive a day later.</p>
+    <p class="stamp">Generated 2026-09-05 16:04 · 48 of 48 plates counted</p>
+  </header>
+
+  <h2>What we found out</h2>
+  <p class="lede">Each question below was answered by the same rule, written
+  down <em>before</em> anyone looked at the numbers, so a disappointing
+  answer counts exactly as much as a good one.</p>
+  <div class="cards"><div class="card yes"><h3>Does drying a worm first help it survive?</h3><p class="call">Yes</p><p>Every dried run beat every damp run, by 29 points on average, about 14 more worms alive on every plate of 50.</p></div><div class="card no"><h3>Is the drying gene the reason?</h3><p class="call">No</p><p>Drying helped both strains about the same (29 points against 23). Drying protects, but this gene is not the reason; something else is doing it.</p></div><div class="card yes"><h3>Is the drying safe on its own?</h3><p class="call">Yes</p><p>With no stress, dried and damp worms survived about the same (93% against 96%). The drying itself is not what is killing them.</p></div></div>
+
+  <h2>How many worms lived through it</h2>
+  <p class="lede">Out of about 50 worms on every plate, counted 24 hours after
+  the stress. Higher is better; this is the whole experiment in one chart.</p>
+  <figure><div class="legend"><span><i class="swatch" style="background:var(--g3);border-color:var(--e3)"></i>Normal · dried</span><span><i class="swatch" style="background:var(--g1);border-color:var(--e1)"></i>Normal · damp</span><span><i class="swatch" style="background:var(--g4);border-color:var(--e4)"></i>Broken gene · dried</span><span><i class="swatch" style="background:var(--g2);border-color:var(--e2)"></i>Broken gene · damp</span></div><div class="chart-scroll"><svg viewBox="0 0 1180 460" role="img" aria-label="chart"><line x1="70" x2="1160" y1="338.0" y2="338.0" stroke="var(--rule)" stroke-width="1"/><text x="60" y="342.0" text-anchor="end" font-size="11.5" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">0</text><line x1="70" x2="1160" y1="259.0" y2="259.0" stroke="var(--rule)" stroke-width="1"/><text x="60" y="263.0" text-anchor="end" font-size="11.5" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">18</text><line x1="70" x2="1160" y1="180.0" y2="180.0" stroke="var(--rule)" stroke-width="1"/><text x="60" y="184.0" text-anchor="end" font-size="11.5" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">37</text><line x1="70" x2="1160" y1="101.0" y2="101.0" stroke="var(--rule)" stroke-width="1"/><text x="60" y="105.0" text-anchor="end" font-size="11.5" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">55</text><line x1="70" x2="1160" y1="22.0" y2="22.0" stroke="var(--rule)" stroke-width="1"/><text x="60" y="26.0" text-anchor="end" font-size="11.5" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">73</text><rect x="124.5" y="58.1" width="163.5" height="279.9" rx="5" fill="var(--g3)" stroke="var(--e3)" stroke-width="2"/><line x1="206.2" x2="206.2" y1="45.4" y2="71.3" stroke="var(--ink)" stroke-width="1.75"/><line x1="198.2" x2="214.2" y1="45.4" y2="45.4" stroke="var(--ink)" stroke-width="1.75"/><line x1="198.2" x2="214.2" y1="71.3" y2="71.3" stroke="var(--ink)" stroke-width="1.75"/><circle cx="206.2" cy="71.3" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="206.2" cy="45.4" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="206.2" cy="57.7" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><text x="206.2" y="364.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">Normal</text><text x="206.2" y="379.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">dried</text><text x="206.2" y="398.0" text-anchor="middle" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">3 runs: 62–68%</text><text x="206.2" y="420.0" text-anchor="middle" font-size="14.5" font-weight="640" fill="var(--ink-2)" style="font-variant-numeric:tabular-nums"><tspan font-size="10.5" font-weight="600" fill="var(--ink-3)" letter-spacing=".06em">AVG </tspan>65%</text><rect x="397.0" y="182.6" width="163.5" height="155.4" rx="5" fill="var(--g1)" stroke="var(--e1)" stroke-width="2"/><line x1="478.8" x2="478.8" y1="180.2" y2="187.0" stroke="var(--ink)" stroke-width="1.75"/><line x1="470.8" x2="486.8" y1="180.2" y2="180.2" stroke="var(--ink)" stroke-width="1.75"/><line x1="470.8" x2="486.8" y1="187.0" y2="187.0" stroke="var(--ink)" stroke-width="1.75"/><circle cx="478.8" cy="180.6" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="478.8" cy="180.2" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="478.8" cy="187.0" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><text x="478.8" y="364.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">Normal</text><text x="478.8" y="379.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">damp</text><text x="478.8" y="398.0" text-anchor="middle" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">3 runs: 35–37%</text><text x="478.8" y="420.0" text-anchor="middle" font-size="14.5" font-weight="640" fill="var(--ink-2)" style="font-variant-numeric:tabular-nums"><tspan font-size="10.5" font-weight="600" fill="var(--ink-3)" letter-spacing=".06em">AVG </tspan>36%</text><rect x="669.5" y="93.1" width="163.5" height="244.9" rx="5" fill="var(--g4)" stroke="var(--e4)" stroke-width="2"/><line x1="751.2" x2="751.2" y1="77.6" y2="107.2" stroke="var(--ink)" stroke-width="1.75"/><line x1="743.2" x2="759.2" y1="77.6" y2="77.6" stroke="var(--ink)" stroke-width="1.75"/><line x1="743.2" x2="759.2" y1="107.2" y2="107.2" stroke="var(--ink)" stroke-width="1.75"/><circle cx="751.2" cy="94.5" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="751.2" cy="77.6" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="751.2" cy="107.2" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><text x="751.2" y="364.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">Broken gene</text><text x="751.2" y="379.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">dried</text><text x="751.2" y="398.0" text-anchor="middle" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">3 runs: 53–60%</text><text x="751.2" y="420.0" text-anchor="middle" font-size="14.5" font-weight="640" fill="var(--ink-2)" style="font-variant-numeric:tabular-nums"><tspan font-size="10.5" font-weight="600" fill="var(--ink-3)" letter-spacing=".06em">AVG </tspan>57%</text><rect x="942.0" y="192.8" width="163.5" height="145.2" rx="5" fill="var(--g2)" stroke="var(--e2)" stroke-width="2"/><line x1="1023.8" x2="1023.8" y1="191.3" y2="193.7" stroke="var(--ink)" stroke-width="1.75"/><line x1="1015.8" x2="1031.8" y1="191.3" y2="191.3" stroke="var(--ink)" stroke-width="1.75"/><line x1="1015.8" x2="1031.8" y1="193.7" y2="193.7" stroke="var(--ink)" stroke-width="1.75"/><circle cx="1023.8" cy="191.3" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="1023.8" cy="193.7" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="1023.8" cy="193.5" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><text x="1023.8" y="364.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">Broken gene</text><text x="1023.8" y="379.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">damp</text><text x="1023.8" y="398.0" text-anchor="middle" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">3 runs: 33–34%</text><text x="1023.8" y="420.0" text-anchor="middle" font-size="14.5" font-weight="640" fill="var(--ink-2)" style="font-variant-numeric:tabular-nums"><tspan font-size="10.5" font-weight="600" fill="var(--ink-3)" letter-spacing=".06em">AVG </tspan>34%</text><line x1="70" x2="1160" y1="338.0" y2="338.0" stroke="var(--rule-2)" stroke-width="1.5"/></svg></div><p class="cap">Each bar is a group's average survival across the three stresses. The three rings on the line through it are the three runs, and the whisker joins the worst run to the best. The dashed line is how many survived with no stress applied: the ceiling nothing can beat. <b>Read the rings, not the bar:</b> if two groups' rings reach into each other, those groups cannot be told apart.</p></figure>
+
+  <h2>Did drying help, and did the gene matter?</h2>
+  <p class="lede">The question the whole stage exists for. If drying protects
+  <em>because of this gene</em>, then breaking the gene should take the
+  protection away with it.</p>
+  <figure><div class="chart-scroll"><svg viewBox="0 0 1180 420" role="img" aria-label="chart"><line x1="70" x2="1160" y1="298.0" y2="298.0" stroke="var(--rule)" stroke-width="1"/><text x="60" y="302.0" text-anchor="end" font-size="11.5" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">0</text><line x1="70" x2="1160" y1="229.0" y2="229.0" stroke="var(--rule)" stroke-width="1"/><text x="60" y="233.0" text-anchor="end" font-size="11.5" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">8</text><line x1="70" x2="1160" y1="160.0" y2="160.0" stroke="var(--rule)" stroke-width="1"/><text x="60" y="164.0" text-anchor="end" font-size="11.5" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">17</text><line x1="70" x2="1160" y1="91.0" y2="91.0" stroke="var(--rule)" stroke-width="1"/><text x="60" y="95.0" text-anchor="end" font-size="11.5" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">25</text><line x1="70" x2="1160" y1="22.0" y2="22.0" stroke="var(--rule)" stroke-width="1"/><text x="60" y="26.0" text-anchor="end" font-size="11.5" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">34</text><rect x="179.0" y="62.0" width="327.0" height="236.0" rx="5" fill="var(--g3)" stroke="var(--e3)" stroke-width="2"/><line x1="342.5" x2="342.5" y1="42.4" y2="90.7" stroke="var(--ink)" stroke-width="1.75"/><line x1="334.5" x2="350.5" y1="42.4" y2="42.4" stroke="var(--ink)" stroke-width="1.75"/><line x1="334.5" x2="350.5" y1="90.7" y2="90.7" stroke="var(--ink)" stroke-width="1.75"/><circle cx="342.5" cy="90.7" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="342.5" cy="42.4" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="342.5" cy="52.9" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><text x="342.5" y="324.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">Normal worm</text><text x="342.5" y="343.0" text-anchor="middle" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">3 runs: 25–31 pts</text><text x="342.5" y="365.0" text-anchor="middle" font-size="14.5" font-weight="640" fill="var(--ink-2)" style="font-variant-numeric:tabular-nums"><tspan font-size="10.5" font-weight="600" fill="var(--ink-3)" letter-spacing=".06em">AVG </tspan>29 pts</text><rect x="724.0" y="109.0" width="327.0" height="189.0" rx="5" fill="var(--g4)" stroke="var(--e4)" stroke-width="2"/><line x1="887.5" x2="887.5" y1="78.0" y2="134.5" stroke="var(--ink)" stroke-width="1.75"/><line x1="879.5" x2="895.5" y1="78.0" y2="78.0" stroke="var(--ink)" stroke-width="1.75"/><line x1="879.5" x2="895.5" y1="134.5" y2="134.5" stroke="var(--ink)" stroke-width="1.75"/><circle cx="887.5" cy="114.6" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="887.5" cy="78.0" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="887.5" cy="134.5" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><text x="887.5" y="324.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">Broken gene</text><text x="887.5" y="343.0" text-anchor="middle" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">3 runs: 20–27 pts</text><text x="887.5" y="365.0" text-anchor="middle" font-size="14.5" font-weight="640" fill="var(--ink-2)" style="font-variant-numeric:tabular-nums"><tspan font-size="10.5" font-weight="600" fill="var(--ink-3)" letter-spacing=".06em">AVG </tspan>23 pts</text><line x1="70" x2="1160" y1="298.0" y2="298.0" stroke="var(--rule-2)" stroke-width="1.5"/></svg></div><p class="cap">How many <b>extra worms out of 100</b> survived because they were dried out first. One bar for normal worms, one for worms with the drying gene broken. Each ring is one run, and both halves of it came from that same run, so a good day or a bad day cannot fake a difference.<br><br><b>If the gene is the reason drying works, the right-hand bar should collapse.</b> If both bars are tall, drying protects and something other than this gene is doing it.</p></figure>
+
+  <h2>Were the survivors actually well?</h2>
+  <p class="lede">Counting who is alive is not the same as knowing who is
+  healthy. Four days later, did the plate produce a next generation?</p>
+  <figure><div class="legend"><span><i class="swatch" style="background:var(--g3);border-color:var(--e3)"></i>Normal · dried</span><span><i class="swatch" style="background:var(--g1);border-color:var(--e1)"></i>Normal · damp</span><span><i class="swatch" style="background:var(--g4);border-color:var(--e4)"></i>Broken gene · dried</span><span><i class="swatch" style="background:var(--g2);border-color:var(--e2)"></i>Broken gene · damp</span></div><div class="chart-scroll"><svg viewBox="0 0 1180 420" role="img" aria-label="chart"><line x1="70" x2="1160" y1="298.0" y2="298.0" stroke="var(--rule)" stroke-width="1"/><text x="60" y="302.0" text-anchor="end" font-size="11.5" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">0</text><line x1="70" x2="1160" y1="229.0" y2="229.0" stroke="var(--rule)" stroke-width="1"/><text x="60" y="233.0" text-anchor="end" font-size="11.5" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">0</text><line x1="70" x2="1160" y1="160.0" y2="160.0" stroke="var(--rule)" stroke-width="1"/><text x="60" y="164.0" text-anchor="end" font-size="11.5" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">1</text><line x1="70" x2="1160" y1="91.0" y2="91.0" stroke="var(--rule)" stroke-width="1"/><text x="60" y="95.0" text-anchor="end" font-size="11.5" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">1</text><line x1="70" x2="1160" y1="22.0" y2="22.0" stroke="var(--rule)" stroke-width="1"/><text x="60" y="26.0" text-anchor="end" font-size="11.5" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">1</text><rect x="124.5" y="106.3" width="163.5" height="191.7" rx="5" fill="var(--g3)" stroke="var(--e3)" stroke-width="2"/><line x1="206.2" x2="206.2" y1="106.3" y2="106.3" stroke="var(--ink)" stroke-width="1.75"/><line x1="198.2" x2="214.2" y1="106.3" y2="106.3" stroke="var(--ink)" stroke-width="1.75"/><line x1="198.2" x2="214.2" y1="106.3" y2="106.3" stroke="var(--ink)" stroke-width="1.75"/><circle cx="206.2" cy="106.3" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="206.2" cy="106.3" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="206.2" cy="106.3" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><text x="206.2" y="324.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">Normal</text><text x="206.2" y="339.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">dried</text><text x="206.2" y="358.0" text-anchor="middle" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">3 runs: 1.0–1.0</text><text x="206.2" y="380.0" text-anchor="middle" font-size="14.5" font-weight="640" fill="var(--ink-2)" style="font-variant-numeric:tabular-nums"><tspan font-size="10.5" font-weight="600" fill="var(--ink-3)" letter-spacing=".06em">AVG </tspan>1.0</text><rect x="397.0" y="255.4" width="163.5" height="42.6" rx="5" fill="var(--g1)" stroke="var(--e1)" stroke-width="2"/><line x1="478.8" x2="478.8" y1="234.1" y2="298.0" stroke="var(--ink)" stroke-width="1.75"/><line x1="470.8" x2="486.8" y1="234.1" y2="234.1" stroke="var(--ink)" stroke-width="1.75"/><line x1="470.8" x2="486.8" y1="298.0" y2="298.0" stroke="var(--ink)" stroke-width="1.75"/><circle cx="478.8" cy="234.1" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="478.8" cy="298.0" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="478.8" cy="234.1" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><text x="478.8" y="324.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">Normal</text><text x="478.8" y="339.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">damp</text><text x="478.8" y="358.0" text-anchor="middle" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">3 runs: 0.0–0.3</text><text x="478.8" y="380.0" text-anchor="middle" font-size="14.5" font-weight="640" fill="var(--ink-2)" style="font-variant-numeric:tabular-nums"><tspan font-size="10.5" font-weight="600" fill="var(--ink-3)" letter-spacing=".06em">AVG </tspan>0.2</text><rect x="669.5" y="106.3" width="163.5" height="191.7" rx="5" fill="var(--g4)" stroke="var(--e4)" stroke-width="2"/><line x1="751.2" x2="751.2" y1="42.4" y2="170.2" stroke="var(--ink)" stroke-width="1.75"/><line x1="743.2" x2="759.2" y1="42.4" y2="42.4" stroke="var(--ink)" stroke-width="1.75"/><line x1="743.2" x2="759.2" y1="170.2" y2="170.2" stroke="var(--ink)" stroke-width="1.75"/><circle cx="751.2" cy="170.2" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="751.2" cy="42.4" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="751.2" cy="106.3" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><text x="751.2" y="324.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">Broken gene</text><text x="751.2" y="339.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">dried</text><text x="751.2" y="358.0" text-anchor="middle" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">3 runs: 0.7–1.3</text><text x="751.2" y="380.0" text-anchor="middle" font-size="14.5" font-weight="640" fill="var(--ink-2)" style="font-variant-numeric:tabular-nums"><tspan font-size="10.5" font-weight="600" fill="var(--ink-3)" letter-spacing=".06em">AVG </tspan>1.0</text><rect x="942.0" y="234.1" width="163.5" height="63.9" rx="5" fill="var(--g2)" stroke="var(--e2)" stroke-width="2"/><line x1="1023.8" x2="1023.8" y1="170.2" y2="298.0" stroke="var(--ink)" stroke-width="1.75"/><line x1="1015.8" x2="1031.8" y1="170.2" y2="170.2" stroke="var(--ink)" stroke-width="1.75"/><line x1="1015.8" x2="1031.8" y1="298.0" y2="298.0" stroke="var(--ink)" stroke-width="1.75"/><circle cx="1023.8" cy="170.2" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="1023.8" cy="298.0" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="1023.8" cy="234.1" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><text x="1023.8" y="324.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">Broken gene</text><text x="1023.8" y="339.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">damp</text><text x="1023.8" y="358.0" text-anchor="middle" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">3 runs: 0.0–0.7</text><text x="1023.8" y="380.0" text-anchor="middle" font-size="14.5" font-weight="640" fill="var(--ink-2)" style="font-variant-numeric:tabular-nums"><tspan font-size="10.5" font-weight="600" fill="var(--ink-3)" letter-spacing=".06em">AVG </tspan>0.3</text><line x1="70" x2="1160" y1="298.0" y2="298.0" stroke="var(--rule-2)" stroke-width="1.5"/></svg></div><p class="cap">Four days after the stress, every plate is looked at once and scored <b>0</b> (no new worms), <b>1</b> (a few) or <b>2</b> (crowded). <b>Alive is not the same as well</b>: a worm can crawl through a stress and be too damaged to breed, and a survival count alone would score that as a success.<br><br>This is deliberately rough. Counting eggs properly would mean putting every worm on its own plate and moving it daily for five days: hundreds of plates, more work than the whole rest of the experiment. A group that survives well but scores 0 here is worth a second look.</p></figure>
+
+  <h2>Each stress on its own</h2>
+  <p class="lede">The chart above pools the three stresses together. Here they
+  are separately, in case one behaves differently from the others.</p>
+  <div class="legend"><span><i class="swatch" style="background:var(--g3);border-color:var(--e3)"></i>Normal · dried</span><span><i class="swatch" style="background:var(--g1);border-color:var(--e1)"></i>Normal · damp</span><span><i class="swatch" style="background:var(--g4);border-color:var(--e4)"></i>Broken gene · dried</span><span><i class="swatch" style="background:var(--g2);border-color:var(--e2)"></i>Broken gene · damp</span></div><div class="grid2"><figure><h3 style="margin-top:0">UV light</h3><div class="chart-scroll"><svg viewBox="0 0 560 390" role="img" aria-label="chart"><line x1="70" x2="540" y1="268.0" y2="268.0" stroke="var(--rule)" stroke-width="1"/><text x="60" y="272.0" text-anchor="end" font-size="11.5" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">0</text><line x1="70" x2="540" y1="206.5" y2="206.5" stroke="var(--rule)" stroke-width="1"/><text x="60" y="210.5" text-anchor="end" font-size="11.5" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">18</text><line x1="70" x2="540" y1="145.0" y2="145.0" stroke="var(--rule)" stroke-width="1"/><text x="60" y="149.0" text-anchor="end" font-size="11.5" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">36</text><line x1="70" x2="540" y1="83.5" y2="83.5" stroke="var(--rule)" stroke-width="1"/><text x="60" y="87.5" text-anchor="end" font-size="11.5" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">55</text><line x1="70" x2="540" y1="22.0" y2="22.0" stroke="var(--rule)" stroke-width="1"/><text x="60" y="26.0" text-anchor="end" font-size="11.5" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">73</text><rect x="93.5" y="55.8" width="70.5" height="212.2" rx="5" fill="var(--g3)" stroke="var(--e3)" stroke-width="2"/><line x1="128.8" x2="128.8" y1="44.6" y2="63.5" stroke="var(--ink)" stroke-width="1.75"/><line x1="120.8" x2="136.8" y1="44.6" y2="44.6" stroke="var(--ink)" stroke-width="1.75"/><line x1="120.8" x2="136.8" y1="63.5" y2="63.5" stroke="var(--ink)" stroke-width="1.75"/><circle cx="128.8" cy="59.2" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="128.8" cy="44.6" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="128.8" cy="63.5" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><text x="128.8" y="294.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">Normal</text><text x="128.8" y="309.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">dried</text><text x="128.8" y="328.0" text-anchor="middle" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">3 runs: 60–66%</text><text x="128.8" y="350.0" text-anchor="middle" font-size="14.5" font-weight="640" fill="var(--ink-2)" style="font-variant-numeric:tabular-nums"><tspan font-size="10.5" font-weight="600" fill="var(--ink-3)" letter-spacing=".06em">AVG </tspan>63%</text><rect x="211.0" y="185.4" width="70.5" height="82.6" rx="5" fill="var(--g1)" stroke="var(--e1)" stroke-width="2"/><line x1="246.2" x2="246.2" y1="167.2" y2="209.1" stroke="var(--ink)" stroke-width="1.75"/><line x1="238.2" x2="254.2" y1="167.2" y2="167.2" stroke="var(--ink)" stroke-width="1.75"/><line x1="238.2" x2="254.2" y1="209.1" y2="209.1" stroke="var(--ink)" stroke-width="1.75"/><circle cx="246.2" cy="209.1" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="246.2" cy="179.7" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="246.2" cy="167.2" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><text x="246.2" y="294.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">Normal</text><text x="246.2" y="309.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">damp</text><text x="246.2" y="328.0" text-anchor="middle" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">3 runs: 17–30%</text><text x="246.2" y="350.0" text-anchor="middle" font-size="14.5" font-weight="640" fill="var(--ink-2)" style="font-variant-numeric:tabular-nums"><tspan font-size="10.5" font-weight="600" fill="var(--ink-3)" letter-spacing=".06em">AVG </tspan>24%</text><rect x="328.5" y="78.1" width="70.5" height="189.9" rx="5" fill="var(--g4)" stroke="var(--e4)" stroke-width="2"/><line x1="363.8" x2="363.8" y1="40.2" y2="102.2" stroke="var(--ink)" stroke-width="1.75"/><line x1="355.8" x2="371.8" y1="40.2" y2="40.2" stroke="var(--ink)" stroke-width="1.75"/><line x1="355.8" x2="371.8" y1="102.2" y2="102.2" stroke="var(--ink)" stroke-width="1.75"/><circle cx="363.8" cy="102.2" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="363.8" cy="40.2" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="363.8" cy="91.7" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><text x="363.8" y="294.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">Broken gene</text><text x="363.8" y="309.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">dried</text><text x="363.8" y="328.0" text-anchor="middle" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">3 runs: 49–67%</text><text x="363.8" y="350.0" text-anchor="middle" font-size="14.5" font-weight="640" fill="var(--ink-2)" style="font-variant-numeric:tabular-nums"><tspan font-size="10.5" font-weight="600" fill="var(--ink-3)" letter-spacing=".06em">AVG </tspan>56%</text><rect x="446.0" y="172.8" width="70.5" height="95.2" rx="5" fill="var(--g2)" stroke="var(--e2)" stroke-width="2"/><line x1="481.2" x2="481.2" y1="161.8" y2="179.7" stroke="var(--ink)" stroke-width="1.75"/><line x1="473.2" x2="489.2" y1="161.8" y2="161.8" stroke="var(--ink)" stroke-width="1.75"/><line x1="473.2" x2="489.2" y1="179.7" y2="179.7" stroke="var(--ink)" stroke-width="1.75"/><circle cx="481.2" cy="161.8" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="481.2" cy="176.9" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="481.2" cy="179.7" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><text x="481.2" y="294.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">Broken gene</text><text x="481.2" y="309.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">damp</text><text x="481.2" y="328.0" text-anchor="middle" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">3 runs: 26–31%</text><text x="481.2" y="350.0" text-anchor="middle" font-size="14.5" font-weight="640" fill="var(--ink-2)" style="font-variant-numeric:tabular-nums"><tspan font-size="10.5" font-weight="600" fill="var(--ink-3)" letter-spacing=".06em">AVG </tspan>28%</text><line x1="70" x2="540" y1="268.0" y2="268.0" stroke="var(--rule-2)" stroke-width="1.5"/></svg></div></figure><figure><h3 style="margin-top:0">Two hours in a −20 °C freezer</h3><div class="chart-scroll"><svg viewBox="0 0 560 390" role="img" aria-label="chart"><line x1="70" x2="540" y1="268.0" y2="268.0" stroke="var(--rule)" stroke-width="1"/><text x="60" y="272.0" text-anchor="end" font-size="11.5" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">0</text><line x1="70" x2="540" y1="206.5" y2="206.5" stroke="var(--rule)" stroke-width="1"/><text x="60" y="210.5" text-anchor="end" font-size="11.5" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">17</text><line x1="70" x2="540" y1="145.0" y2="145.0" stroke="var(--rule)" stroke-width="1"/><text x="60" y="149.0" text-anchor="end" font-size="11.5" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">34</text><line x1="70" x2="540" y1="83.5" y2="83.5" stroke="var(--rule)" stroke-width="1"/><text x="60" y="87.5" text-anchor="end" font-size="11.5" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">51</text><line x1="70" x2="540" y1="22.0" y2="22.0" stroke="var(--rule)" stroke-width="1"/><text x="60" y="26.0" text-anchor="end" font-size="11.5" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">68</text><rect x="93.5" y="72.1" width="70.5" height="195.9" rx="5" fill="var(--g3)" stroke="var(--e3)" stroke-width="2"/><line x1="128.8" x2="128.8" y1="40.2" y2="106.6" stroke="var(--ink)" stroke-width="1.75"/><line x1="120.8" x2="136.8" y1="40.2" y2="40.2" stroke="var(--ink)" stroke-width="1.75"/><line x1="120.8" x2="136.8" y1="106.6" y2="106.6" stroke="var(--ink)" stroke-width="1.75"/><circle cx="128.8" cy="106.6" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="128.8" cy="40.2" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="128.8" cy="69.6" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><text x="128.8" y="294.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">Normal</text><text x="128.8" y="309.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">dried</text><text x="128.8" y="328.0" text-anchor="middle" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">3 runs: 45–63%</text><text x="128.8" y="350.0" text-anchor="middle" font-size="14.5" font-weight="640" fill="var(--ink-2)" style="font-variant-numeric:tabular-nums"><tspan font-size="10.5" font-weight="600" fill="var(--ink-3)" letter-spacing=".06em">AVG </tspan>54%</text><rect x="211.0" y="153.6" width="70.5" height="114.4" rx="5" fill="var(--g1)" stroke="var(--e1)" stroke-width="2"/><line x1="246.2" x2="246.2" y1="140.0" y2="170.7" stroke="var(--ink)" stroke-width="1.75"/><line x1="238.2" x2="254.2" y1="140.0" y2="140.0" stroke="var(--ink)" stroke-width="1.75"/><line x1="238.2" x2="254.2" y1="170.7" y2="170.7" stroke="var(--ink)" stroke-width="1.75"/><circle cx="246.2" cy="150.0" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="246.2" cy="140.0" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="246.2" cy="170.7" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><text x="246.2" y="294.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">Normal</text><text x="246.2" y="309.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">damp</text><text x="246.2" y="328.0" text-anchor="middle" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">3 runs: 27–35%</text><text x="246.2" y="350.0" text-anchor="middle" font-size="14.5" font-weight="640" fill="var(--ink-2)" style="font-variant-numeric:tabular-nums"><tspan font-size="10.5" font-weight="600" fill="var(--ink-3)" letter-spacing=".06em">AVG </tspan>32%</text><rect x="328.5" y="107.0" width="70.5" height="161.0" rx="5" fill="var(--g4)" stroke="var(--e4)" stroke-width="2"/><line x1="363.8" x2="363.8" y1="87.3" y2="120.5" stroke="var(--ink)" stroke-width="1.75"/><line x1="355.8" x2="371.8" y1="87.3" y2="87.3" stroke="var(--ink)" stroke-width="1.75"/><line x1="355.8" x2="371.8" y1="120.5" y2="120.5" stroke="var(--ink)" stroke-width="1.75"/><circle cx="363.8" cy="87.3" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="363.8" cy="120.5" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="363.8" cy="113.2" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><text x="363.8" y="294.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">Broken gene</text><text x="363.8" y="309.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">dried</text><text x="363.8" y="328.0" text-anchor="middle" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">3 runs: 41–50%</text><text x="363.8" y="350.0" text-anchor="middle" font-size="14.5" font-weight="640" fill="var(--ink-2)" style="font-variant-numeric:tabular-nums"><tspan font-size="10.5" font-weight="600" fill="var(--ink-3)" letter-spacing=".06em">AVG </tspan>45%</text><rect x="446.0" y="156.9" width="70.5" height="111.1" rx="5" fill="var(--g2)" stroke="var(--e2)" stroke-width="2"/><line x1="481.2" x2="481.2" y1="134.5" y2="183.4" stroke="var(--ink)" stroke-width="1.75"/><line x1="473.2" x2="489.2" y1="134.5" y2="134.5" stroke="var(--ink)" stroke-width="1.75"/><line x1="473.2" x2="489.2" y1="183.4" y2="183.4" stroke="var(--ink)" stroke-width="1.75"/><circle cx="481.2" cy="183.4" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="481.2" cy="152.7" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="481.2" cy="134.5" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><text x="481.2" y="294.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">Broken gene</text><text x="481.2" y="309.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">damp</text><text x="481.2" y="328.0" text-anchor="middle" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">3 runs: 23–37%</text><text x="481.2" y="350.0" text-anchor="middle" font-size="14.5" font-weight="640" fill="var(--ink-2)" style="font-variant-numeric:tabular-nums"><tspan font-size="10.5" font-weight="600" fill="var(--ink-3)" letter-spacing=".06em">AVG </tspan>31%</text><line x1="70" x2="540" y1="268.0" y2="268.0" stroke="var(--rule-2)" stroke-width="1.5"/></svg></div></figure><figure><h3 style="margin-top:0">Living on MGS-1 Mars dust</h3><div class="chart-scroll"><svg viewBox="0 0 560 390" role="img" aria-label="chart"><line x1="70" x2="540" y1="268.0" y2="268.0" stroke="var(--rule)" stroke-width="1"/><text x="60" y="272.0" text-anchor="end" font-size="11.5" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">0</text><line x1="70" x2="540" y1="206.5" y2="206.5" stroke="var(--rule)" stroke-width="1"/><text x="60" y="210.5" text-anchor="end" font-size="11.5" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">21</text><line x1="70" x2="540" y1="145.0" y2="145.0" stroke="var(--rule)" stroke-width="1"/><text x="60" y="149.0" text-anchor="end" font-size="11.5" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">43</text><line x1="70" x2="540" y1="83.5" y2="83.5" stroke="var(--rule)" stroke-width="1"/><text x="60" y="87.5" text-anchor="end" font-size="11.5" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">64</text><line x1="70" x2="540" y1="22.0" y2="22.0" stroke="var(--rule)" stroke-width="1"/><text x="60" y="26.0" text-anchor="end" font-size="11.5" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">86</text><rect x="93.5" y="45.6" width="70.5" height="222.4" rx="5" fill="var(--g3)" stroke="var(--e3)" stroke-width="2"/><line x1="128.8" x2="128.8" y1="40.2" y2="55.1" stroke="var(--ink)" stroke-width="1.75"/><line x1="120.8" x2="136.8" y1="40.2" y2="40.2" stroke="var(--ink)" stroke-width="1.75"/><line x1="120.8" x2="136.8" y1="55.1" y2="55.1" stroke="var(--ink)" stroke-width="1.75"/><circle cx="128.8" cy="41.5" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="128.8" cy="55.1" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="128.8" cy="40.2" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><text x="128.8" y="294.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">Normal</text><text x="128.8" y="309.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">dried</text><text x="128.8" y="328.0" text-anchor="middle" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">3 runs: 74–79%</text><text x="128.8" y="350.0" text-anchor="middle" font-size="14.5" font-weight="640" fill="var(--ink-2)" style="font-variant-numeric:tabular-nums"><tspan font-size="10.5" font-weight="600" fill="var(--ink-3)" letter-spacing=".06em">AVG </tspan>77%</text><rect x="211.0" y="119.1" width="70.5" height="148.9" rx="5" fill="var(--g1)" stroke="var(--e1)" stroke-width="2"/><line x1="246.2" x2="246.2" y1="97.7" y2="129.9" stroke="var(--ink)" stroke-width="1.75"/><line x1="238.2" x2="254.2" y1="97.7" y2="97.7" stroke="var(--ink)" stroke-width="1.75"/><line x1="238.2" x2="254.2" y1="129.9" y2="129.9" stroke="var(--ink)" stroke-width="1.75"/><circle cx="246.2" cy="97.7" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="246.2" cy="129.9" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="246.2" cy="129.7" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><text x="246.2" y="294.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">Normal</text><text x="246.2" y="309.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">damp</text><text x="246.2" y="328.0" text-anchor="middle" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">3 runs: 48–59%</text><text x="246.2" y="350.0" text-anchor="middle" font-size="14.5" font-weight="640" fill="var(--ink-2)" style="font-variant-numeric:tabular-nums"><tspan font-size="10.5" font-weight="600" fill="var(--ink-3)" letter-spacing=".06em">AVG </tspan>52%</text><rect x="328.5" y="68.7" width="70.5" height="199.3" rx="5" fill="var(--g4)" stroke="var(--e4)" stroke-width="2"/><line x1="363.8" x2="363.8" y1="59.3" y2="80.4" stroke="var(--ink)" stroke-width="1.75"/><line x1="355.8" x2="371.8" y1="59.3" y2="59.3" stroke="var(--ink)" stroke-width="1.75"/><line x1="355.8" x2="371.8" y1="80.4" y2="80.4" stroke="var(--ink)" stroke-width="1.75"/><circle cx="363.8" cy="66.6" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="363.8" cy="59.3" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="363.8" cy="80.4" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><text x="363.8" y="294.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">Broken gene</text><text x="363.8" y="309.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">dried</text><text x="363.8" y="328.0" text-anchor="middle" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">3 runs: 65–73%</text><text x="363.8" y="350.0" text-anchor="middle" font-size="14.5" font-weight="640" fill="var(--ink-2)" style="font-variant-numeric:tabular-nums"><tspan font-size="10.5" font-weight="600" fill="var(--ink-3)" letter-spacing=".06em">AVG </tspan>69%</text><rect x="446.0" y="147.5" width="70.5" height="120.5" rx="5" fill="var(--g2)" stroke="var(--e2)" stroke-width="2"/><line x1="481.2" x2="481.2" y1="132.6" y2="160.8" stroke="var(--ink)" stroke-width="1.75"/><line x1="473.2" x2="489.2" y1="132.6" y2="132.6" stroke="var(--ink)" stroke-width="1.75"/><line x1="473.2" x2="489.2" y1="160.8" y2="160.8" stroke="var(--ink)" stroke-width="1.75"/><circle cx="481.2" cy="132.6" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="481.2" cy="149.2" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="481.2" cy="160.8" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><text x="481.2" y="294.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">Broken gene</text><text x="481.2" y="309.0" text-anchor="middle" font-size="12" fill="var(--ink-2)">damp</text><text x="481.2" y="328.0" text-anchor="middle" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">3 runs: 37–47%</text><text x="481.2" y="350.0" text-anchor="middle" font-size="14.5" font-weight="640" fill="var(--ink-2)" style="font-variant-numeric:tabular-nums"><tspan font-size="10.5" font-weight="600" fill="var(--ink-3)" letter-spacing=".06em">AVG </tspan>42%</text><line x1="70" x2="540" y1="268.0" y2="268.0" stroke="var(--rule-2)" stroke-width="1.5"/></svg></div></figure></div>
+
+  <h2>How each answer was worked out</h2>
+  <p class="lede">Which groups each question actually put head to head. Every
+  one of them was decided before the experiment started.</p>
+  <div class="tw"><table><thead><tr><th>The question</th><th>What was compared</th><th class="num">Difference</th><th>Do the runs overlap?</th></tr></thead><tbody><tr><td><b>Does drying a worm first help it survive?</b><br><span style="color:var(--ink-3);font-size:13px">The headline. Normal worms only, and only the three real stresses: dried against damp.</span></td><td>Normal worms, kept <b>damp</b><br><span style="color:var(--ink-3);font-size:12.5px">3 runs: 35–37%</span><br><span style="color:var(--ink-3);font-size:12.5px">against</span><br>Normal worms, <b>dried</b> first<br><span style="color:var(--ink-3);font-size:12.5px">3 runs: 62–68%</span></td><td class="num">+29</td><td>no overlap</td></tr><tr><td><b>Is the drying gene the reason?</b><br><span style="color:var(--ink-3);font-size:13px">How much drying was worth to a normal worm, against how much it was worth to one with the gene broken. This is the question the whole 37-gene design rests on.</span></td><td>What drying was worth to the <b>broken-gene</b> worm<br><span style="color:var(--ink-3);font-size:12.5px">3 runs: 20–27 pts</span><br><span style="color:var(--ink-3);font-size:12.5px">against</span><br>What drying was worth to the <b>normal</b> worm<br><span style="color:var(--ink-3);font-size:12.5px">3 runs: 25–31 pts</span></td><td class="num">+6</td><td>they overlap</td></tr><tr><td><b>Is the drying safe on its own?</b><br><span style="color:var(--ink-3);font-size:13px">The check that keeps the rest honest: dried against damp worms with no stress applied at all.</span></td><td>Normal worms, damp, <b>no stress</b><br><span style="color:var(--ink-3);font-size:12.5px">3 runs: 93–98%</span><br><span style="color:var(--ink-3);font-size:12.5px">against</span><br>Normal worms, dried, <b>no stress</b><br><span style="color:var(--ink-3);font-size:12.5px">3 runs: 91–94%</span></td><td class="num">-3</td><td>they overlap</td></tr></tbody></table></div>
+  <div class="note warn"><b>How sure can we be, with three runs?</b> Every comparison above asks one thing: <b>did the runs overlap?</b> If the worst run in one group still beat the best run in the other, that is as strong as three runs can get. If they cross, the honest answer is that we could not tell them apart, not that they are the same.<br><br><b>A difference also has to be big enough to matter.</b> A result here needs at least <b>10 percentage points</b>, about five worms on a plate of fifty. Below that, three runs cannot tell a real effect from a good day.</div>
+
+  <h2>Every group, every number</h2>
+  <div class="tw"><table class="grid"><thead><tr><th>Group</th><th class="num">No stress at all</th><th class="num">UV light</th><th class="num">Two hours in a −20 °C freezer</th><th class="num">Living on MGS-1 Mars dust</th></tr></thead><tbody><tr><td><span class="dot" style="background:var(--g3);border-color:var(--e3)"></span>Normal · dried</td><td class="num">93<br><span style="color:var(--ink-3);font-size:12px">91&ndash;94</span></td><td class="num">63<br><span style="color:var(--ink-3);font-size:12px">60&ndash;66</span></td><td class="num">54<br><span style="color:var(--ink-3);font-size:12px">45&ndash;63</span></td><td class="num">77<br><span style="color:var(--ink-3);font-size:12px">74&ndash;79</span></td></tr><tr><td><span class="dot" style="background:var(--g1);border-color:var(--e1)"></span>Normal · damp</td><td class="num">96<br><span style="color:var(--ink-3);font-size:12px">93&ndash;98</span></td><td class="num">24<br><span style="color:var(--ink-3);font-size:12px">17&ndash;30</span></td><td class="num">32<br><span style="color:var(--ink-3);font-size:12px">27&ndash;35</span></td><td class="num">52<br><span style="color:var(--ink-3);font-size:12px">48&ndash;59</span></td></tr><tr><td><span class="dot" style="background:var(--g4);border-color:var(--e4)"></span>Broken gene · dried</td><td class="num">88<br><span style="color:var(--ink-3);font-size:12px">82&ndash;92</span></td><td class="num">56<br><span style="color:var(--ink-3);font-size:12px">49&ndash;67</span></td><td class="num">45<br><span style="color:var(--ink-3);font-size:12px">41&ndash;50</span></td><td class="num">69<br><span style="color:var(--ink-3);font-size:12px">65&ndash;73</span></td></tr><tr><td><span class="dot" style="background:var(--g2);border-color:var(--e2)"></span>Broken gene · damp</td><td class="num">89<br><span style="color:var(--ink-3);font-size:12px">85&ndash;94</span></td><td class="num">28<br><span style="color:var(--ink-3);font-size:12px">26&ndash;31</span></td><td class="num">31<br><span style="color:var(--ink-3);font-size:12px">23&ndash;37</span></td><td class="num">42<br><span style="color:var(--ink-3);font-size:12px">37&ndash;47</span></td></tr></tbody></table></div><p class="cap">Survival as a percentage. Big number is the average of the three runs; the smaller pair under it is the worst run and the best. <b>No stress</b> is the control; everything else should be read against it.</p>
+
+  <h2>Was the data any good?</h2>
+  <p class="lede">These checks run before any answer is worked out. A report
+  that cannot tell you what is missing should not be trusted about what is
+  there.</p>
+  <div class="note"><b>Every check passed.</b> All 48 plates are described. Every plate has been counted. Untreated worms survived at 96%, as they should. The drying chamber behaved the same way in every run.</div>
+
+  <div class="end"><span>end of report</span></div>
+</div>
+
+<script>
+// ---- light / dark switch ----
+(function () {
+  const btn = document.getElementById("themeBtn");
+  const SUN = '<svg viewBox="0 0 24 24"><path d="M12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-13a1 1 0 0 1-1-1V1a1 1 0 0 1 2 0v2a1 1 0 0 1-1 1zm0 20a1 1 0 0 1-1-1v-2a1 1 0 0 1 2 0v2a1 1 0 0 1-1 1zM4 13H2a1 1 0 0 1 0-2h2a1 1 0 0 1 0 2zm18 0h-2a1 1 0 0 1 0-2h2a1 1 0 0 1 0 2zM5.6 6.99 4.2 5.58A1 1 0 0 1 5.61 4.17L7.02 5.58A1 1 0 1 1 5.6 6.99zm12.8 12.8-1.41-1.41a1 1 0 0 1 1.41-1.41l1.41 1.41a1 1 0 0 1-1.41 1.41zM6.99 18.4 5.58 19.8a1 1 0 0 1-1.41-1.41l1.41-1.41A1 1 0 1 1 6.99 18.4zM19.8 5.58 18.4 6.99a1 1 0 0 1-1.41-1.41L18.4 4.17a1 1 0 0 1 1.41 1.41z"/></svg>';
+  const MOON = '<svg viewBox="0 0 24 24"><path d="M12.3 22C6.6 22 2 17.4 2 11.7 2 6.9 5.3 2.8 9.9 1.7a1 1 0 0 1 1.1 1.5 7.6 7.6 0 0 0 9.7 10.6 1 1 0 0 1 1.3 1.3A10.3 10.3 0 0 1 12.3 22z"/></svg>';
+
+  // The page is light-first, so an unset theme means "whatever the OS says",
+  // and the OS default here is light.
+  const prefersDark = window.matchMedia
+    ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+
+  function current() {
+    const set = document.documentElement.getAttribute("data-theme");
+    if (set) return set;
+    return prefersDark && prefersDark.matches ? "dark" : "light";
+  }
+  function paint() {
+    const dark = current() === "dark";
+    btn.innerHTML = dark ? SUN : MOON;      // show what you will GET
+    btn.title = dark ? "Switch to light" : "Switch to dark";
+    btn.setAttribute("aria-label", btn.title);
+  }
+  btn.addEventListener("click", () => {
+    const next = current() === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    try { localStorage.setItem("marsworm-theme", next); } catch (e) {}
+    paint();
+  });
+  try {
+    const saved = localStorage.getItem("marsworm-theme");
+    if (saved) document.documentElement.setAttribute("data-theme", saved);
+  } catch (e) {}
+  if (prefersDark) prefersDark.addEventListener("change", paint);
+  paint();
+})();
+
+// ---- fullscreen toggle, YouTube-style ----
+(function () {
+  const btn = document.getElementById("fullscreenBtn");
+  const ENTER = '<svg viewBox="0 0 24 24"><path d="M3 3h6v2H5v4H3V3zm12 0h6v6h-2V5h-4V3zM3 15h2v4h4v2H3v-6zm16 4h-4v2h6v-6h-2v4z"/></svg>';
+  const EXIT  = '<svg viewBox="0 0 24 24"><path d="M5 16H3v5h5v-2H5v-3zm-2-8h2V5h3V3H3v5zm14 11h-3v2h5v-5h-2v3zM14 3v2h3v3h2V3h-5z"/></svg>';
+
+  function isFullscreen() {
+    return !!(document.fullscreenElement || document.webkitFullscreenElement ||
+              document.mozFullScreenElement || document.msFullscreenElement);
+  }
+  async function enter() {
+    const el = document.documentElement;
+    const req = el.requestFullscreen || el.webkitRequestFullscreen ||
+                el.mozRequestFullScreen || el.msRequestFullscreen;
+    if (req) await req.call(el);
+    // NOTE: no navigator.keyboard.lock() here, deliberately. The Mission Map
+    // locks Escape because it has popups that need to swallow the first press.
+    // This page has none, so locking Escape would only break the one thing
+    // everybody expects it to do -- leave fullscreen.
+  }
+  function exit() {
+    if (isFullscreen()) {
+      const ex = document.exitFullscreen || document.webkitExitFullscreen ||
+                 document.mozCancelFullScreen || document.msExitFullscreen;
+      if (ex) ex.call(document);
+    }
+  }
+  function paint() {
+    if (isFullscreen()) {
+      btn.innerHTML = EXIT;
+      btn.title = "Exit full screen";
+      btn.setAttribute("data-fullscreen", "true");
+    } else {
+      btn.innerHTML = ENTER + '<span class="fs-label">Full screen</span>';
+      btn.title = "Full screen";
+      btn.removeAttribute("data-fullscreen");
+    }
+  }
+  btn.addEventListener("click", () => {
+    isFullscreen() ? exit() : enter();
+    btn.blur();          // otherwise the ring lingers and reads as "active"
+  });
+  ["fullscreenchange", "webkitfullscreenchange", "mozfullscreenchange",
+   "MSFullscreenChange"].forEach(ev => document.addEventListener(ev, paint));
+  paint();
+})();
+</script>
+</body>
+</html>
