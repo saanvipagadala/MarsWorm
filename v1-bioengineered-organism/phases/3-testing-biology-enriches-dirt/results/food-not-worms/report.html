@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dry run: It was the food, not the worms</title>
+<style>
+  /* Light is the base. Every colour is a token so both themes stay a set. */
+  :root{
+    --bg:#FBFAF7; --surface:#FFFFFF; --sunken:#F4F1EA;
+    --ink:#1B1A17; --ink-2:#4A4740; --ink-3:#7C776C;
+    --rule:#E2DDD1; --rule-2:#CFC8B8;
+    --g1:#E5DBCA; --g2:#F3D6A2; --g3:#A9D9C0; --g4:#BBD6EE; --g5:#CAC4EC;
+    --e1:#A8977A; --e2:#C98A1E; --e3:#218A61; --e4:#4E85B8; --e5:#6F63C4;
+    --good:#1C6B4A; --warn:#B5651D; --bad:#A33A2A; --flat:#7C776C;
+    --shadow:0 1px 2px rgba(27,26,23,.06),0 4px 14px rgba(27,26,23,.05);
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#14161A; --surface:#1B1E24; --sunken:#22262E;
+      --ink:#F2EFE8; --ink-2:#BFBAAF; --ink-3:#8B867B;
+      --rule:#2E333C; --rule-2:#3D434E;
+      --g1:#6E6555; --g2:#8C6C36; --g3:#3B6E58; --g4:#455F7C; --g5:#585177;
+      --e1:#B3A489; --e2:#E0A448; --e3:#5FBE94; --e4:#7FADD9; --e5:#9A8FE0;
+      --good:#3E9E71; --warn:#E9A23C; --bad:#E0705C; --flat:#8B867B;
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 16px rgba(0,0,0,.3);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#14161A; --surface:#1B1E24; --sunken:#22262E;
+    --ink:#F2EFE8; --ink-2:#BFBAAF; --ink-3:#8B867B;
+    --rule:#2E333C; --rule-2:#3D434E;
+    --g1:#6E6555; --g2:#8C6C36; --g3:#3B6E58; --g4:#455F7C; --g5:#585177;
+    --e1:#B3A489; --e2:#E0A448; --e3:#5FBE94; --e4:#7FADD9; --e5:#9A8FE0;
+    --good:#3E9E71; --warn:#E9A23C; --bad:#E0705C; --flat:#8B867B;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 16px rgba(0,0,0,.3);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font:16px/1.6 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* The page fills the screen and so does the text. Nothing is capped to a
+     column width -- a sentence runs the width of the window and wraps only
+     when it actually reaches the edge. */
+  .wrap{width:100%;margin:0;padding:36px clamp(20px,4vw,64px) 88px}
+  header{border-bottom:2px solid var(--ink);padding-bottom:20px;margin-bottom:8px}
+  .eyebrow{
+    font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ink-3);font-weight:650;margin:0 0 8px
+  }
+  h1{font-size:clamp(30px,4vw,50px);line-height:1.1;margin:0 0 12px;
+     letter-spacing:-.02em}
+  .sub{color:var(--ink-2);margin:0;font-size:17.5px}
+  .stamp{color:var(--ink-3);font-size:13px;margin-top:14px}
+  h2{font-size:25px;margin:52px 0 6px;letter-spacing:-.01em}
+  h2 + .lede{color:var(--ink-2);margin:0 0 20px}
+  h3{font-size:17px;margin:26px 0 8px}
+  p{margin:0 0 12px}
+  a{color:inherit;text-underline-offset:2px}
+  /* ---- verdict cards ---------------------------------------------- */
+  .cards{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));margin:18px 0 0}
+  .card{
+    background:var(--surface);border:1px solid var(--rule);border-radius:12px;
+    padding:18px 20px;box-shadow:var(--shadow);border-top:4px solid var(--flat)
+  }
+  .card.yes{border-top-color:var(--good)} .card.no{border-top-color:var(--bad)}
+  .card.partial{border-top-color:var(--warn)}
+  .card.na{border-top-color:var(--rule-2)}
+  .card.na .call{color:var(--ink-3)}
+  .card h3{margin:0 0 4px;font-size:15px;color:var(--ink-3);
+           letter-spacing:.06em;text-transform:uppercase}
+  .card .call{font-size:20px;font-weight:680;margin:2px 0 8px;letter-spacing:-.01em}
+  .card.yes .call{color:var(--good)} .card.no .call{color:var(--bad)}
+  .card.partial .call{color:var(--warn)}
+  .card p{margin:0;font-size:14.5px;color:var(--ink-2)}
+  .card p b{color:var(--ink)}
+  /* the dust -> soil ruler, with this run's mark on it */
+  .ruler{margin:2px 0 12px}
+  .ruler .track{position:relative;height:9px;border-radius:99px;
+                background:var(--g1);border:1px solid var(--rule-2)}
+  .ruler .fill{position:absolute;inset:0 auto 0 0;border-radius:99px;
+               background:var(--g3)}
+  .ruler .pin{position:absolute;top:50%;width:3px;height:19px;border-radius:2px;
+              background:var(--ink);transform:translate(-50%,-50%)}
+  .ruler .ends{display:flex;justify-content:space-between;margin-top:7px;
+               font-size:11.5px;line-height:1.35;color:var(--ink-3)}
+  .ruler .ends span:last-child{text-align:right}
+  /* ---- figures ----------------------------------------------------- */
+  figure{margin:22px 0 0;background:var(--surface);border:1px solid var(--rule);
+         border-radius:12px;padding:20px 20px 14px;box-shadow:var(--shadow)}
+  figure .cap{font-size:14px;color:var(--ink-2);margin:12px 0 0}
+  figure .what{font-size:13.5px;color:var(--ink-3);margin:0 0 10px}
+  .chart-scroll{overflow-x:auto}
+  svg{display:block;max-width:100%;height:auto}
+  .legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin:0 0 14px;
+          font-size:13.5px;color:var(--ink-2)}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+  .swatch{width:13px;height:13px;border-radius:4px;border:2px solid var(--rule-2);
+          display:inline-block;flex:none}
+  .grid2{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(440px,1fr))}
+  /* ---- tables ------------------------------------------------------ */
+  .tw{overflow-x:auto;margin:16px 0 0;border:1px solid var(--rule);
+      border-radius:12px;background:var(--surface);box-shadow:var(--shadow)}
+  .tw + .cap{margin:16px 0 0;font-size:14px;color:var(--ink-2)}
+  .tw:last-child{margin-bottom:8px}
+  table{border-collapse:collapse;width:100%;font-size:14.5px}
+  th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--rule)}
+  thead th{background:var(--sunken);font-size:12px;letter-spacing:.07em;
+           text-transform:uppercase;color:var(--ink-3);white-space:nowrap}
+  tbody tr:last-child td{border-bottom:none}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+  .tag{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;
+       font-weight:640;letter-spacing:.02em;white-space:nowrap}
+  .tag.yes{background:color-mix(in srgb,var(--good) 16%,transparent);color:var(--good)}
+  .tag.no{background:color-mix(in srgb,var(--bad) 16%,transparent);color:var(--bad)}
+  .tag.partial{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
+  .tag.flat,.tag.na{background:var(--sunken);color:var(--ink-3)}
+  .dot{width:9px;height:9px;border-radius:3px;display:inline-block;margin-right:7px;
+       border:2px solid var(--rule-2);vertical-align:-1px}
+  /* ---- the full-data grid ------------------------------------------
+     Nine columns will not fit any screen, so: the headers wrap instead of
+     forcing the columns wide, the numbers get tight columns, and the group
+     name stays pinned to the left while the rest scrolls under it. */
+  table.grid{font-size:13.5px}
+  table.grid th,table.grid td{padding:8px 10px}
+  table.grid thead th{white-space:normal;vertical-align:bottom;
+                      max-width:104px;line-height:1.3}
+  table.grid tbody td{white-space:nowrap}
+  table.grid th:first-child,table.grid td:first-child{
+    position:sticky;left:0;z-index:2;white-space:nowrap;
+    box-shadow:1px 0 0 var(--rule-2)}
+  table.grid thead th:first-child{background:var(--sunken);z-index:3}
+  table.grid tbody td:first-child{background:var(--surface)}
+  table.grid tbody td:first-child.best{
+    background:color-mix(in srgb,var(--g3) 42%,var(--surface))}
+  table.grid tr.ref td:first-child{background:var(--sunken)}
+  table.grid td.best{background:color-mix(in srgb,var(--g3) 42%,transparent);
+                     font-weight:680;color:var(--ink)}
+  /* rounded ends, so the band reads as one stripe */
+  table.grid tbody td:first-child.best{border-radius:7px 0 0 7px}
+  table.grid tbody td.best:last-child{border-radius:0 7px 7px 0}
+  table.grid tr.ref td{color:var(--ink-3)}
+  table.grid tr.ref{background:var(--sunken)}
+  /* ---- notes ------------------------------------------------------- */
+  .note{background:var(--sunken);border-left:3px solid var(--rule-2);
+        border-radius:0 8px 8px 0;padding:16px 20px;margin:18px 0 0;
+        font-size:15px;color:var(--ink-2)}
+  .note p:last-child{margin-bottom:0}
+  .note b{color:var(--ink)}
+  .note.warn{border-left-color:var(--warn)}
+  code{font:13.5px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;
+       background:var(--sunken);padding:1px 6px;border-radius:5px}
+  /* the page just stopped before; this says it meant to */
+  .end{display:flex;align-items:center;gap:16px;margin:64px 0 0;
+       color:var(--ink-3)}
+  .end::before,.end::after{content:"";flex:1;height:1px;background:var(--rule)}
+  .end span{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;
+            font-weight:600;white-space:nowrap}
+  @media (prefers-reduced-motion:no-preference){
+    .card,figure{transition:box-shadow .18s ease}
+  }
+  /* ---- the two chrome buttons -------------------------------------- */
+  .chip{
+    display:inline-flex;align-items:center;gap:8px;cursor:pointer;
+    background:var(--surface);color:var(--ink-2);
+    border:1px solid var(--rule-2);border-radius:99px;
+    padding:9px 14px;font:inherit;font-size:13.5px;font-weight:600;
+    box-shadow:var(--shadow);line-height:1;
+  }
+  .chip:hover{color:var(--ink);border-color:var(--ink-3)}
+  .chip:focus-visible{outline:2px solid var(--ink-3);outline-offset:2px}
+  .chip svg{width:16px;height:16px;fill:currentColor;flex:none}
+  #themeBtn{position:fixed;top:18px;right:18px;z-index:40;padding:10px}
+  #fullscreenBtn{position:fixed;bottom:18px;right:18px;z-index:40}
+  #fullscreenBtn[data-fullscreen] .fs-label{display:none}
+  @media print{.chip{display:none}}
+</style>
+</head>
+<body>
+<button id="themeBtn" class="chip" type="button" aria-label="Switch theme"></button>
+<button id="fullscreenBtn" class="chip" type="button" title="Full screen"></button>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">MarsWorm · Stage 3 · Testing Biology Enriches Dirt</p>
+    <h1>Dry run: It was the food, not the worms</h1>
+    <p class="sub">5 recipes × 3 cups, four weeks of soil measurements and three weeks of seedlings. Every figure is computed from raw weights and counts in <code>food-not-worms/</code>.</p>
+    <p class="stamp">Generated 2026-09-05 15:58 · 15 of 15 cups have a final weight</p>
+  </header>
+
+  <h2>What we found out</h2>
+  <p class="lede">Each question below was answered by the same rule, written
+  down <em>before</em> anyone looked at the numbers, so a disappointing
+  answer counts exactly as much as a good one.</p>
+  <div class="cards"><div class="card yes"><h3>Did the regolith turn into something that grows?</h3><p class="call">Yes</p><p>Every treated cup grew more than every bare-regolith cup, 7.0 times heavier on average, with no overlap at all. Which part did it is the next question.</p></div><div class="card no"><h3>Did the worms add anything the food did not?</h3><p class="call">No</p><p>The food explains it. Cups with the same food and no worms did just as well.</p></div><div class="card na"><h3>Were the castings enough on their own?</h3><p class="call">Nothing to compare</p><p>The worms added nothing beyond the food here, so there is nothing for the castings to replace.</p></div><div class="card flat"><h3>How far did we get from bare dust toward real soil?</h3><p class="call">28% of the way</p><div class="ruler"><div class="track"><div class="fill" style="width:28.5%"></div><div class="pin" style="left:28.5%"></div></div><div class="ends"><span>bare dust<br>0.03 g</span><span>real potting soil<br>0.76 g</span></div></div><p>Bare regolith grew 0.03 g of plant and real potting soil grew 0.76 g, and that is the whole ruler. The cups with worms reached <b>0.24 g</b>, which is <b>28%</b> of the way along it.</p></div></div>
+
+  <h2>How much the plants weighed</h2>
+  <p class="lede">The dried plants, weighed on day 21. Everything else on this
+  page describes the <em>soil</em>. This is the one that asks whether anything
+  actually grew in it.</p>
+  <figure><div class="legend"><span><i class="swatch" style="background:var(--g1);border-color:var(--e1)"></i><b>1</b>&nbsp;Regolith only</span><span><i class="swatch" style="background:var(--g2);border-color:var(--e2)"></i><b>2</b>&nbsp;+ organics</span><span><i class="swatch" style="background:var(--g3);border-color:var(--e3)"></i><b>3</b>&nbsp;+ organics + worms</span><span><i class="swatch" style="background:var(--g4);border-color:var(--e4)"></i><b>4</b>&nbsp;+ organics + castings</span><span><i class="swatch" style="background:var(--g5);border-color:var(--e5)"></i><b>5</b>&nbsp;Potting soil</span></div><div class="chart-scroll"><svg viewBox="0 0 1180 460" role="img" aria-label="How much the plants weighed by group"><line x1="70" x2="1160" y1="338.0" y2="338.0" stroke="var(--rule)" stroke-width="1"/><text x="60" y="342.0" text-anchor="end" font-size="11.5" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">0</text><line x1="70" x2="1160" y1="259.0" y2="259.0" stroke="var(--rule)" stroke-width="1"/><text x="60" y="263.0" text-anchor="end" font-size="11.5" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">0.2165</text><line x1="70" x2="1160" y1="180.0" y2="180.0" stroke="var(--rule)" stroke-width="1"/><text x="60" y="184.0" text-anchor="end" font-size="11.5" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">0.433</text><line x1="70" x2="1160" y1="101.0" y2="101.0" stroke="var(--rule)" stroke-width="1"/><text x="60" y="105.0" text-anchor="end" font-size="11.5" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">0.6495</text><line x1="70" x2="1160" y1="22.0" y2="22.0" stroke="var(--rule)" stroke-width="1"/><text x="60" y="26.0" text-anchor="end" font-size="11.5" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">0.866</text><text x="15" y="180" font-size="12.5" fill="var(--ink-3)" text-anchor="middle" transform="rotate(-90 15 180)">How much the plants weighed (g)</text><line x1="70" x2="1160" y1="60.9" y2="60.9" stroke="var(--e5)" stroke-width="2" stroke-dasharray="7 5"/><text x="78" y="51.9" text-anchor="start" font-size="12.5" font-weight="620" fill="var(--e5)">the goal, real soil</text><rect x="107.1" y="325.4" width="143.9" height="12.6" rx="5" fill="var(--g1)" stroke="var(--e1)" stroke-width="2"/><line x1="179.0" x2="179.0" y1="306.3" y2="338.0" stroke="var(--ink)" stroke-width="1.75"/><line x1="171.0" x2="187.0" y1="306.3" y2="306.3" stroke="var(--ink)" stroke-width="1.75"/><line x1="171.0" x2="187.0" y1="338.0" y2="338.0" stroke="var(--ink)" stroke-width="1.75"/><circle cx="179.0" cy="306.3" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="179.0" cy="338.0" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="179.0" cy="331.8" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><text x="179.0" y="358.0" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--ink-2)">1</text><text x="179.0" y="374.0" text-anchor="middle" font-size="11.5" fill="var(--ink-3)">Regolith only</text><text x="179.0" y="392.0" text-anchor="middle" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">3 cups: 0.00–0.09 g</text><text x="179.0" y="414.0" text-anchor="middle" font-size="14.5" font-weight="640" fill="var(--ink-2)" style="font-variant-numeric:tabular-nums"><tspan font-size="10.5" font-weight="600" fill="var(--ink-3)" letter-spacing=".06em">AVG </tspan>0.03 g</text><rect x="325.1" y="256.8" width="143.9" height="81.2" rx="5" fill="var(--g2)" stroke="var(--e2)" stroke-width="2"/><line x1="397.0" x2="397.0" y1="236.6" y2="267.2" stroke="var(--ink)" stroke-width="1.75"/><line x1="389.0" x2="405.0" y1="236.6" y2="236.6" stroke="var(--ink)" stroke-width="1.75"/><line x1="389.0" x2="405.0" y1="267.2" y2="267.2" stroke="var(--ink)" stroke-width="1.75"/><circle cx="397.0" cy="236.6" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="397.0" cy="267.2" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="397.0" cy="266.5" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><text x="397.0" y="358.0" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--ink-2)">2</text><text x="397.0" y="374.0" text-anchor="middle" font-size="11.5" fill="var(--ink-3)">+ organics</text><text x="397.0" y="392.0" text-anchor="middle" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">3 cups: 0.19–0.28 g</text><text x="397.0" y="414.0" text-anchor="middle" font-size="14.5" font-weight="640" fill="var(--ink-2)" style="font-variant-numeric:tabular-nums"><tspan font-size="10.5" font-weight="600" fill="var(--ink-3)" letter-spacing=".06em">AVG </tspan>0.22 g</text><rect x="543.1" y="250.1" width="143.9" height="87.9" rx="5" fill="var(--g3)" stroke="var(--e3)" stroke-width="2"/><line x1="615.0" x2="615.0" y1="236.2" y2="269.8" stroke="var(--ink)" stroke-width="1.75"/><line x1="607.0" x2="623.0" y1="236.2" y2="236.2" stroke="var(--ink)" stroke-width="1.75"/><line x1="607.0" x2="623.0" y1="269.8" y2="269.8" stroke="var(--ink)" stroke-width="1.75"/><circle cx="615.0" cy="236.2" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="615.0" cy="269.8" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="615.0" cy="244.2" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><text x="615.0" y="358.0" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--ink-2)">3</text><text x="615.0" y="374.0" text-anchor="middle" font-size="11.5" fill="var(--ink-3)">+ organics</text><text x="615.0" y="388.0" text-anchor="middle" font-size="11.5" fill="var(--ink-3)">+ worms</text><text x="615.0" y="406.0" text-anchor="middle" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">3 cups: 0.19–0.28 g</text><text x="615.0" y="428.0" text-anchor="middle" font-size="14.5" font-weight="640" fill="var(--ink-2)" style="font-variant-numeric:tabular-nums"><tspan font-size="10.5" font-weight="600" fill="var(--ink-3)" letter-spacing=".06em">AVG </tspan>0.24 g</text><rect x="761.1" y="269.4" width="143.9" height="68.6" rx="5" fill="var(--g4)" stroke="var(--e4)" stroke-width="2"/><line x1="833.0" x2="833.0" y1="253.0" y2="280.3" stroke="var(--ink)" stroke-width="1.75"/><line x1="825.0" x2="841.0" y1="253.0" y2="253.0" stroke="var(--ink)" stroke-width="1.75"/><line x1="825.0" x2="841.0" y1="280.3" y2="280.3" stroke="var(--ink)" stroke-width="1.75"/><circle cx="833.0" cy="253.0" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="833.0" cy="280.3" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="833.0" cy="274.9" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><text x="833.0" y="358.0" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--ink-2)">4</text><text x="833.0" y="374.0" text-anchor="middle" font-size="11.5" fill="var(--ink-3)">+ organics</text><text x="833.0" y="388.0" text-anchor="middle" font-size="11.5" fill="var(--ink-3)">+ castings</text><text x="833.0" y="406.0" text-anchor="middle" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">3 cups: 0.16–0.23 g</text><text x="833.0" y="428.0" text-anchor="middle" font-size="14.5" font-weight="640" fill="var(--ink-2)" style="font-variant-numeric:tabular-nums"><tspan font-size="10.5" font-weight="600" fill="var(--ink-3)" letter-spacing=".06em">AVG </tspan>0.19 g</text><rect x="979.1" y="60.9" width="143.9" height="277.1" rx="5" fill="var(--g5)" stroke="var(--e5)" stroke-width="2"/><line x1="1051.0" x2="1051.0" y1="39.9" y2="82.9" stroke="var(--ink)" stroke-width="1.75"/><line x1="1043.0" x2="1059.0" y1="39.9" y2="39.9" stroke="var(--ink)" stroke-width="1.75"/><line x1="1043.0" x2="1059.0" y1="82.9" y2="82.9" stroke="var(--ink)" stroke-width="1.75"/><circle cx="1051.0" cy="39.9" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="1051.0" cy="82.9" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><circle cx="1051.0" cy="60.0" r="4.2" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.8"/><text x="1051.0" y="358.0" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--ink-2)">5</text><text x="1051.0" y="374.0" text-anchor="middle" font-size="11.5" fill="var(--ink-3)">Potting soil</text><text x="1051.0" y="392.0" text-anchor="middle" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">3 cups: 0.70–0.82 g</text><text x="1051.0" y="414.0" text-anchor="middle" font-size="14.5" font-weight="640" fill="var(--ink-2)" style="font-variant-numeric:tabular-nums"><tspan font-size="10.5" font-weight="600" fill="var(--ink-3)" letter-spacing=".06em">AVG </tspan>0.76 g</text><line x1="70" x2="1160" y1="338" y2="338" stroke="var(--rule-2)" stroke-width="1.5"/></svg></div><p class="cap">Every group has <b>three cups</b>, and all three are drawn: the rings stacked on the line through each bar. The whisker joins the lightest cup to the heaviest, and those same two weights are printed under the group name. <b>AVG</b> below them is the average of the three. The dashed line running across the chart is what ordinary potting soil managed, the height everything else is trying to reach.<br><br><b>Read the rings, not the bar.</b> Three cups is not many, so one odd cup can pull an average a surprising distance. If the rings of two groups reach into each other, those two groups cannot be told apart, and rings sitting on top of each other mean those cups weighed the same. Group 3 closed <b>28%</b> of the distance from bare regolith to potting soil.</p></figure>
+
+  <h2>How the soil changed over four weeks</h2>
+  <p class="lede">Measured once a week, before anything was planted. These are
+  the numbers that explain <em>why</em> the plants did or did not grow.</p>
+  <div class="legend"><span><i class="swatch" style="background:var(--g1);border-color:var(--e1)"></i><b>1</b>&nbsp;Regolith only</span><span><i class="swatch" style="background:var(--g2);border-color:var(--e2)"></i><b>2</b>&nbsp;+ organics</span><span><i class="swatch" style="background:var(--g3);border-color:var(--e3)"></i><b>3</b>&nbsp;+ organics + worms</span><span><i class="swatch" style="background:var(--g4);border-color:var(--e4)"></i><b>4</b>&nbsp;+ organics + castings</span><span><i class="swatch" style="background:var(--g5);border-color:var(--e5)"></i><b>5</b>&nbsp;Potting soil</span></div><div class="grid2"><figure><h3 style="margin-top:0">Soil that held together in crumbs</h3><p class="what">How much of a 10 g scoop stayed on the 2 mm sieve.</p><div class="chart-scroll"><svg viewBox="0 0 560 310" role="img" aria-label="Soil that held together in crumbs for each group, week by week"><line x1="58" x2="494" y1="264.0" y2="264.0" stroke="var(--rule)" stroke-width="1"/><text x="49" y="268.0" text-anchor="end" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">0.813</text><line x1="58" x2="494" y1="181.3" y2="181.3" stroke="var(--rule)" stroke-width="1"/><text x="49" y="185.3" text-anchor="end" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">20.2</text><line x1="58" x2="494" y1="98.7" y2="98.7" stroke="var(--rule)" stroke-width="1"/><text x="49" y="102.7" text-anchor="end" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">39.6</text><line x1="58" x2="494" y1="16.0" y2="16.0" stroke="var(--rule)" stroke-width="1"/><text x="49" y="20.0" text-anchor="end" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">59.1</text><text x="15" y="140" font-size="11.5" fill="var(--ink-3)" text-anchor="middle" transform="rotate(-90 15 140)">Soil that held together in crumbs (%)</text><text x="58.0" y="284" text-anchor="middle" font-size="11" fill="var(--ink-3)">1</text><text x="203.3" y="284" text-anchor="middle" font-size="11" fill="var(--ink-3)">2</text><text x="348.7" y="284" text-anchor="middle" font-size="11" fill="var(--ink-3)">3</text><text x="494.0" y="284" text-anchor="middle" font-size="11" fill="var(--ink-3)">4</text><line x1="58" x2="494" y1="264.0" y2="264.0" stroke="var(--rule-2)" stroke-width="1.5"/><text x="276" y="303" text-anchor="middle" font-size="11.5" fill="var(--ink-3)">week of the experiment</text><path d="M58.0,243.3 L203.3,226.1 L348.7,240.6 L494.0,226.6" fill="none" stroke="var(--e1)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="494.0" cy="226.6" r="4" fill="var(--e1)" stroke="var(--surface)" stroke-width="2"/><text x="503.0" y="230.6" font-size="11" font-weight="640" fill="var(--e1)" style="font-variant-numeric:tabular-nums">1 · 10 %</text><path d="M58.0,214.8 L203.3,196.4 L348.7,185.7 L494.0,176.6" fill="none" stroke="var(--e2)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="494.0" cy="176.6" r="4" fill="var(--e2)" stroke="var(--surface)" stroke-width="2"/><text x="503.0" y="198.2" font-size="11" font-weight="640" fill="var(--e2)" style="font-variant-numeric:tabular-nums">2 · 21 %</text><path d="M58.0,223.0 L203.3,203.4 L348.7,178.0 L494.0,173.8" fill="none" stroke="var(--e3)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="494.0" cy="173.8" r="4" fill="var(--e3)" stroke="var(--surface)" stroke-width="2"/><text x="503.0" y="185.2" font-size="11" font-weight="640" fill="var(--e3)" style="font-variant-numeric:tabular-nums">3 · 22 %</text><path d="M58.0,219.0 L203.3,204.5 L348.7,185.3 L494.0,168.2" fill="none" stroke="var(--e4)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="494.0" cy="168.2" r="4" fill="var(--e4)" stroke="var(--surface)" stroke-width="2"/><text x="503.0" y="172.2" font-size="11" font-weight="640" fill="var(--e4)" style="font-variant-numeric:tabular-nums">4 · 23 %</text><path d="M58.0,58.3 L203.3,42.0 L348.7,36.7 L494.0,49.8" fill="none" stroke="var(--e5)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="494.0" cy="49.8" r="4" fill="var(--e5)" stroke="var(--surface)" stroke-width="2"/><text x="503.0" y="53.8" font-size="11" font-weight="640" fill="var(--e5)" style="font-variant-numeric:tabular-nums">5 · 51 %</text></svg></div><p class="cap">Higher is better: soil that clumps into crumbs holds water and lets roots through. Dust falls straight through the sieve.</p></figure><figure><h3 style="margin-top:0">Water the soil held on to</h3><p class="what">How much water the soil held on to after being watered and left to drip.</p><div class="chart-scroll"><svg viewBox="0 0 560 310" role="img" aria-label="Water the soil held on to for each group, week by week"><line x1="58" x2="494" y1="264.0" y2="264.0" stroke="var(--rule)" stroke-width="1"/><text x="49" y="268.0" text-anchor="end" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">15.3</text><line x1="58" x2="494" y1="181.3" y2="181.3" stroke="var(--rule)" stroke-width="1"/><text x="49" y="185.3" text-anchor="end" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">31</text><line x1="58" x2="494" y1="98.7" y2="98.7" stroke="var(--rule)" stroke-width="1"/><text x="49" y="102.7" text-anchor="end" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">46.7</text><line x1="58" x2="494" y1="16.0" y2="16.0" stroke="var(--rule)" stroke-width="1"/><text x="49" y="20.0" text-anchor="end" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">62.3</text><text x="15" y="140" font-size="11.5" fill="var(--ink-3)" text-anchor="middle" transform="rotate(-90 15 140)">Water the soil held on to (%)</text><text x="58.0" y="284" text-anchor="middle" font-size="11" fill="var(--ink-3)">1</text><text x="203.3" y="284" text-anchor="middle" font-size="11" fill="var(--ink-3)">2</text><text x="348.7" y="284" text-anchor="middle" font-size="11" fill="var(--ink-3)">3</text><text x="494.0" y="284" text-anchor="middle" font-size="11" fill="var(--ink-3)">4</text><line x1="58" x2="494" y1="264.0" y2="264.0" stroke="var(--rule-2)" stroke-width="1.5"/><text x="276" y="303" text-anchor="middle" font-size="11.5" fill="var(--ink-3)">week of the experiment</text><path d="M58.0,243.3 L203.3,236.7 L348.7,234.7 L494.0,241.8" fill="none" stroke="var(--e1)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="494.0" cy="241.8" r="4" fill="var(--e1)" stroke="var(--surface)" stroke-width="2"/><text x="503.0" y="245.8" font-size="11" font-weight="640" fill="var(--e1)" style="font-variant-numeric:tabular-nums">1 · 20 %</text><path d="M58.0,219.3 L203.3,209.9 L348.7,185.8 L494.0,176.8" fill="none" stroke="var(--e2)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="494.0" cy="176.8" r="4" fill="var(--e2)" stroke="var(--surface)" stroke-width="2"/><text x="503.0" y="180.8" font-size="11" font-weight="640" fill="var(--e2)" style="font-variant-numeric:tabular-nums">2 · 32 %</text><path d="M58.0,209.9 L203.3,216.8 L348.7,183.8 L494.0,181.1" fill="none" stroke="var(--e3)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="494.0" cy="181.1" r="4" fill="var(--e3)" stroke="var(--surface)" stroke-width="2"/><text x="503.0" y="193.8" font-size="11" font-weight="640" fill="var(--e3)" style="font-variant-numeric:tabular-nums">3 · 31 %</text><path d="M58.0,223.1 L203.3,188.2 L348.7,196.7 L494.0,182.2" fill="none" stroke="var(--e4)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="494.0" cy="182.2" r="4" fill="var(--e4)" stroke="var(--surface)" stroke-width="2"/><text x="503.0" y="206.8" font-size="11" font-weight="640" fill="var(--e4)" style="font-variant-numeric:tabular-nums">4 · 31 %</text><path d="M58.0,39.9 L203.3,41.1 L348.7,47.6 L494.0,36.7" fill="none" stroke="var(--e5)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="494.0" cy="36.7" r="4" fill="var(--e5)" stroke="var(--surface)" stroke-width="2"/><text x="503.0" y="40.7" font-size="11" font-weight="640" fill="var(--e5)" style="font-variant-numeric:tabular-nums">5 · 58 %</text></svg></div><p class="cap">Higher is better: a plant can only drink what the soil keeps. Regolith drains almost instantly.</p></figure><figure><h3 style="margin-top:0">Plant food in the soil</h3><p class="what">Nitrate on an aquarium test strip.</p><div class="chart-scroll"><svg viewBox="0 0 560 310" role="img" aria-label="Plant food in the soil for each group, week by week"><line x1="58" x2="494" y1="264.0" y2="264.0" stroke="var(--rule)" stroke-width="1"/><text x="49" y="268.0" text-anchor="end" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">-5.03</text><line x1="58" x2="494" y1="181.3" y2="181.3" stroke="var(--rule)" stroke-width="1"/><text x="49" y="185.3" text-anchor="end" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">19.1</text><line x1="58" x2="494" y1="98.7" y2="98.7" stroke="var(--rule)" stroke-width="1"/><text x="49" y="102.7" text-anchor="end" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">43.2</text><line x1="58" x2="494" y1="16.0" y2="16.0" stroke="var(--rule)" stroke-width="1"/><text x="49" y="20.0" text-anchor="end" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">67.4</text><text x="15" y="140" font-size="11.5" fill="var(--ink-3)" text-anchor="middle" transform="rotate(-90 15 140)">Plant food in the soil (ppm)</text><text x="58.0" y="284" text-anchor="middle" font-size="11" fill="var(--ink-3)">1</text><text x="203.3" y="284" text-anchor="middle" font-size="11" fill="var(--ink-3)">2</text><text x="348.7" y="284" text-anchor="middle" font-size="11" fill="var(--ink-3)">3</text><text x="494.0" y="284" text-anchor="middle" font-size="11" fill="var(--ink-3)">4</text><line x1="58" x2="494" y1="264.0" y2="264.0" stroke="var(--rule-2)" stroke-width="1.5"/><text x="276" y="303" text-anchor="middle" font-size="11.5" fill="var(--ink-3)">week of the experiment</text><path d="M58.0,243.3 L203.3,241.0 L348.7,243.3 L494.0,241.0" fill="none" stroke="var(--e1)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="494.0" cy="241.0" r="4" fill="var(--e1)" stroke="var(--surface)" stroke-width="2"/><text x="503.0" y="245.0" font-size="11" font-weight="640" fill="var(--e1)" style="font-variant-numeric:tabular-nums">1 · 2 ppm</text><path d="M58.0,217.1 L203.3,209.1 L348.7,192.0 L494.0,187.4" fill="none" stroke="var(--e2)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="494.0" cy="187.4" r="4" fill="var(--e2)" stroke="var(--surface)" stroke-width="2"/><text x="503.0" y="201.0" font-size="11" font-weight="640" fill="var(--e2)" style="font-variant-numeric:tabular-nums">2 · 17 ppm</text><path d="M58.0,222.8 L203.3,203.4 L348.7,185.1 L494.0,193.1" fill="none" stroke="var(--e3)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="494.0" cy="193.1" r="4" fill="var(--e3)" stroke="var(--surface)" stroke-width="2"/><text x="503.0" y="214.0" font-size="11" font-weight="640" fill="var(--e3)" style="font-variant-numeric:tabular-nums">3 · 16 ppm</text><path d="M58.0,221.6 L203.3,201.1 L348.7,195.4 L494.0,184.0" fill="none" stroke="var(--e4)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="494.0" cy="184.0" r="4" fill="var(--e4)" stroke="var(--surface)" stroke-width="2"/><text x="503.0" y="188.0" font-size="11" font-weight="640" fill="var(--e4)" style="font-variant-numeric:tabular-nums">4 · 18 ppm</text><path d="M58.0,36.7 L203.3,84.6 L348.7,60.6 L494.0,62.9" fill="none" stroke="var(--e5)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="494.0" cy="62.9" r="4" fill="var(--e5)" stroke="var(--surface)" stroke-width="2"/><text x="503.0" y="66.9" font-size="11" font-weight="640" fill="var(--e5)" style="font-variant-numeric:tabular-nums">5 · 54 ppm</text></svg></div><p class="cap">Higher is better: this is the nitrogen plants actually feed on. Bare regolith has essentially none.</p></figure><figure><h3 style="margin-top:0">Buried cloth that rotted away</h3><p class="what">How much of a buried cotton square rotted away.</p><div class="chart-scroll"><svg viewBox="0 0 560 310" role="img" aria-label="Buried cloth that rotted away for each group, week by week"><line x1="58" x2="494" y1="264.0" y2="264.0" stroke="var(--rule)" stroke-width="1"/><text x="49" y="268.0" text-anchor="end" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">-3.04</text><line x1="58" x2="494" y1="181.3" y2="181.3" stroke="var(--rule)" stroke-width="1"/><text x="49" y="185.3" text-anchor="end" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">11.1</text><line x1="58" x2="494" y1="98.7" y2="98.7" stroke="var(--rule)" stroke-width="1"/><text x="49" y="102.7" text-anchor="end" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">25.3</text><line x1="58" x2="494" y1="16.0" y2="16.0" stroke="var(--rule)" stroke-width="1"/><text x="49" y="20.0" text-anchor="end" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">39.5</text><text x="15" y="140" font-size="11.5" fill="var(--ink-3)" text-anchor="middle" transform="rotate(-90 15 140)">Buried cloth that rotted away (%)</text><text x="58.0" y="284" text-anchor="middle" font-size="11" fill="var(--ink-3)">2</text><text x="276.0" y="284" text-anchor="middle" font-size="11" fill="var(--ink-3)">3</text><text x="494.0" y="284" text-anchor="middle" font-size="11" fill="var(--ink-3)">4</text><line x1="58" x2="494" y1="264.0" y2="264.0" stroke="var(--rule-2)" stroke-width="1.5"/><text x="276" y="303" text-anchor="middle" font-size="11.5" fill="var(--ink-3)">week of the experiment</text><path d="M58.0,243.3 L276.0,241.5 L494.0,232.7" fill="none" stroke="var(--e1)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="494.0" cy="232.7" r="4" fill="var(--e1)" stroke="var(--surface)" stroke-width="2"/><text x="503.0" y="236.7" font-size="11" font-weight="640" fill="var(--e1)" style="font-variant-numeric:tabular-nums">1 · 2 %</text><path d="M58.0,228.8 L276.0,214.7 L494.0,179.0" fill="none" stroke="var(--e2)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="494.0" cy="179.0" r="4" fill="var(--e2)" stroke="var(--surface)" stroke-width="2"/><text x="503.0" y="199.1" font-size="11" font-weight="640" fill="var(--e2)" style="font-variant-numeric:tabular-nums">2 · 12 %</text><path d="M58.0,236.6 L276.0,201.0 L494.0,170.5" fill="none" stroke="var(--e3)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="494.0" cy="170.5" r="4" fill="var(--e3)" stroke="var(--surface)" stroke-width="2"/><text x="503.0" y="186.1" font-size="11" font-weight="640" fill="var(--e3)" style="font-variant-numeric:tabular-nums">3 · 13 %</text><path d="M58.0,217.1 L276.0,208.7 L494.0,169.1" fill="none" stroke="var(--e4)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="494.0" cy="169.1" r="4" fill="var(--e4)" stroke="var(--surface)" stroke-width="2"/><text x="503.0" y="173.1" font-size="11" font-weight="640" fill="var(--e4)" style="font-variant-numeric:tabular-nums">4 · 13 %</text><path d="M58.0,176.3 L276.0,102.1 L494.0,36.7" fill="none" stroke="var(--e5)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="494.0" cy="36.7" r="4" fill="var(--e5)" stroke="var(--surface)" stroke-width="2"/><text x="503.0" y="40.7" font-size="11" font-weight="640" fill="var(--e5)" style="font-variant-numeric:tabular-nums">5 · 36 %</text></svg></div><p class="cap">Higher is better: only living things rot cotton, so this is a rough count of how alive the soil is. Nothing rots in sterile dust.</p></figure><figure><h3 style="margin-top:0">pH</h3><p class="what">How acid or alkaline the soil is.</p><div class="chart-scroll"><svg viewBox="0 0 560 310" role="img" aria-label="pH for each group, week by week"><line x1="58" x2="494" y1="264.0" y2="264.0" stroke="var(--rule)" stroke-width="1"/><text x="49" y="268.0" text-anchor="end" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">6.28</text><line x1="58" x2="494" y1="181.3" y2="181.3" stroke="var(--rule)" stroke-width="1"/><text x="49" y="185.3" text-anchor="end" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">7.03</text><line x1="58" x2="494" y1="98.7" y2="98.7" stroke="var(--rule)" stroke-width="1"/><text x="49" y="102.7" text-anchor="end" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">7.77</text><line x1="58" x2="494" y1="16.0" y2="16.0" stroke="var(--rule)" stroke-width="1"/><text x="49" y="20.0" text-anchor="end" font-size="11" fill="var(--ink-3)" style="font-variant-numeric:tabular-nums">8.52</text><text x="15" y="140" font-size="11.5" fill="var(--ink-3)" text-anchor="middle" transform="rotate(-90 15 140)">pH</text><text x="58.0" y="284" text-anchor="middle" font-size="11" fill="var(--ink-3)">1</text><text x="203.3" y="284" text-anchor="middle" font-size="11" fill="var(--ink-3)">2</text><text x="348.7" y="284" text-anchor="middle" font-size="11" fill="var(--ink-3)">3</text><text x="494.0" y="284" text-anchor="middle" font-size="11" fill="var(--ink-3)">4</text><line x1="58" x2="494" y1="264.0" y2="264.0" stroke="var(--rule-2)" stroke-width="1.5"/><text x="276" y="303" text-anchor="middle" font-size="11.5" fill="var(--ink-3)">week of the experiment</text><path d="M58.0,36.7 L203.3,55.1 L348.7,40.4 L494.0,44.0" fill="none" stroke="var(--e1)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="494.0" cy="44.0" r="4" fill="var(--e1)" stroke="var(--surface)" stroke-width="2"/><text x="503.0" y="48.0" font-size="11" font-weight="640" fill="var(--e1)" style="font-variant-numeric:tabular-nums">1 · 8.3</text><path d="M58.0,55.1 L203.3,81.0 L348.7,81.0 L494.0,110.5" fill="none" stroke="var(--e2)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="494.0" cy="110.5" r="4" fill="var(--e2)" stroke="var(--surface)" stroke-width="2"/><text x="503.0" y="129.4" font-size="11" font-weight="640" fill="var(--e2)" style="font-variant-numeric:tabular-nums">2 · 7.7</text><path d="M58.0,62.5 L203.3,66.2 L348.7,99.4 L494.0,99.4" fill="none" stroke="var(--e3)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="494.0" cy="99.4" r="4" fill="var(--e3)" stroke="var(--surface)" stroke-width="2"/><text x="503.0" y="103.4" font-size="11" font-weight="640" fill="var(--e3)" style="font-variant-numeric:tabular-nums">3 · 7.8</text><path d="M58.0,77.3 L203.3,81.0 L348.7,84.6 L494.0,103.1" fill="none" stroke="var(--e4)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="494.0" cy="103.1" r="4" fill="var(--e4)" stroke="var(--surface)" stroke-width="2"/><text x="503.0" y="116.4" font-size="11" font-weight="640" fill="var(--e4)" style="font-variant-numeric:tabular-nums">4 · 7.7</text><path d="M58.0,221.2 L203.3,224.9 L348.7,243.3 L494.0,232.3" fill="none" stroke="var(--e5)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="494.0" cy="232.3" r="4" fill="var(--e5)" stroke="var(--surface)" stroke-width="2"/><text x="503.0" y="236.3" font-size="11" font-weight="640" fill="var(--e5)" style="font-variant-numeric:tabular-nums">5 · 6.6</text></svg></div><p class="cap">Closer to 7 is better. Mars regolith is alkaline, around 8–9, and most crops want 6–7. Neither high nor low is good here; the middle is.</p></figure></div>
+
+  <h2>How each answer was worked out</h2>
+  <p class="lede">Which two groups each question actually put head to head.
+  Every one of them was decided before the experiment started, not gone
+  looking for afterwards because the answer looked good.</p>
+  <div class="tw"><table><thead><tr><th>The question</th><th>What was compared</th><th class="num">Difference</th><th>Do the cups overlap?</th></tr></thead><tbody><tr><td><b>Did the regolith turn into something that grows?</b><br><span style="color:var(--ink-3);font-size:13px">The headline. Group 3 got food AND worms, so this asks whether the whole treatment worked -- not yet which part of it did.</span></td><td><span class="dot" style="background:var(--g1);border-color:var(--e1)"></span><b>Group 1</b> <span style="color:var(--ink-3)">(regolith, nothing added)</span><br><span style="color:var(--ink-3);font-size:12.5px">against</span><br><span class="dot" style="background:var(--g3);border-color:var(--e3)"></span><b>Group 3</b> <span style="color:var(--ink-3)">(food + live worms)</span></td><td class="num">+0.206</td><td>no overlap</td></tr><tr><td><b>Did the worms add anything the food did not?</b><br><span style="color:var(--ink-3);font-size:13px">The comparison that says what the worms themselves were worth. Group 2 got exactly the same food with no worms in it. Asked this way round so it has a yes/no answer -- &#x27;was it the worms or the food?&#x27; cannot be answered with the word yes.</span></td><td><span class="dot" style="background:var(--g2);border-color:var(--e2)"></span><b>Group 2</b> <span style="color:var(--ink-3)">(food, no worms)</span><br><span style="color:var(--ink-3);font-size:12.5px">against</span><br><span class="dot" style="background:var(--g3);border-color:var(--e3)"></span><b>Group 3</b> <span style="color:var(--ink-3)">(food + live worms)</span></td><td class="num">+0.018</td><td>they overlap</td></tr><tr><td><b>Were the castings enough on their own?</b><br><span style="color:var(--ink-3);font-size:13px">If Group 4 keeps up with Group 3, the living worm is not needed -- and the design should target the microbes, not the animal.</span></td><td><span class="dot" style="background:var(--g3);border-color:var(--e3)"></span><b>Group 3</b> <span style="color:var(--ink-3)">(food + live worms)</span><br><span style="color:var(--ink-3);font-size:12.5px">against</span><br><span class="dot" style="background:var(--g4);border-color:var(--e4)"></span><b>Group 4</b> <span style="color:var(--ink-3)">(food + castings)</span></td><td class="num">n/a</td><td>n/a</td></tr><tr><td><b>How far did we get from bare dust toward real soil?</b><br><span style="color:var(--ink-3);font-size:13px">The ruler every other row is measured against -- bare regolith at one end, real potting soil at the other -- and the mark showing where the worm cups actually landed on it.</span></td><td><span class="dot" style="background:var(--g1);border-color:var(--e1)"></span><b>Group 1</b> <span style="color:var(--ink-3)">(regolith, nothing added)</span><br><span style="color:var(--ink-3);font-size:12.5px">against</span><br><span class="dot" style="background:var(--g5);border-color:var(--e5)"></span><b>Group 5</b> <span style="color:var(--ink-3)">(real potting soil)</span></td><td class="num">+0.725</td><td>no overlap</td></tr></tbody></table></div>
+  <div class="note warn"><b>How sure can we be, with three cups?</b> Every comparison above asks one thing: <b>did the two groups overlap?</b> If the worst cup in one group still beat the best cup in the other, that is as strong as three cups can ever get. If the ranges cross, the honest answer is that we could not tell them apart and not that they are the same.<br><br><b>A difference also has to be big enough to matter.</b> A result here needs a gap of at least <b>10%</b> of the whole scale, bare regolith to real potting soil, which is 0.725 g, so at least 0.072 g. Without that rule, plants could triple in weight, still be dead, and get called a success.</div>
+
+  <h2>Every group, every measurement</h2>
+  <div class="tw"><table class="grid"><thead><tr><th>Group</th><th class="num" title="How much the plants weighed">Plant weight (g)<br><span style="font-weight:500;text-transform:none;letter-spacing:0">↑ higher is better</span></th><th class="num" title="Seeds that came up">Seeds up (%)<br><span style="font-weight:500;text-transform:none;letter-spacing:0">↑ higher is better</span></th><th class="num" title="How tall they grew">Height (mm)<br><span style="font-weight:500;text-transform:none;letter-spacing:0">↑ higher is better</span></th><th class="num" title="Soil that held together in crumbs">Crumbs (%)<br><span style="font-weight:500;text-transform:none;letter-spacing:0">↑ higher is better</span></th><th class="num" title="Water the soil held on to">Water held (%)<br><span style="font-weight:500;text-transform:none;letter-spacing:0">↑ higher is better</span></th><th class="num" title="Plant food in the soil">Plant food (ppm)<br><span style="font-weight:500;text-transform:none;letter-spacing:0">↑ higher is better</span></th><th class="num" title="Buried cloth that rotted away">Cloth rotted (%)<br><span style="font-weight:500;text-transform:none;letter-spacing:0">↑ higher is better</span></th><th class="num" title="pH">pH<br><span style="font-weight:500;text-transform:none;letter-spacing:0">→ closer to 7 is better</span></th></tr></thead><tbody><tr><td><span class="dot" style="background:var(--g1);border-color:var(--e1)"></span><b>1</b> Regolith only</td><td class="num">0.03<br><span style="color:var(--ink-3);font-size:12px">0.00&ndash;0.09</span></td><td class="num">20<br><span style="color:var(--ink-3);font-size:12px">10&ndash;30</span></td><td class="num">13<br><span style="color:var(--ink-3);font-size:12px">7&ndash;20</span></td><td class="num">10<br><span style="color:var(--ink-3);font-size:12px">9&ndash;11</span></td><td class="num">20<br><span style="color:var(--ink-3);font-size:12px">18&ndash;21</span></td><td class="num">2<br><span style="color:var(--ink-3);font-size:12px">1&ndash;2</span></td><td class="num">2<br><span style="color:var(--ink-3);font-size:12px">2&ndash;3</span></td><td class="num">8.3<br><span style="color:var(--ink-3);font-size:12px">8.2&ndash;8.4</span></td></tr><tr><td><span class="dot" style="background:var(--g2);border-color:var(--e2)"></span><b>2</b> + organics</td><td class="num">0.22<br><span style="color:var(--ink-3);font-size:12px">0.19&ndash;0.28</span></td><td class="num best">43<br><span style="color:var(--ink-3);font-size:12px">40&ndash;50</span></td><td class="num">23<br><span style="color:var(--ink-3);font-size:12px">18&ndash;34</span></td><td class="num">21<br><span style="color:var(--ink-3);font-size:12px">19&ndash;24</span></td><td class="num best">32<br><span style="color:var(--ink-3);font-size:12px">29&ndash;33</span></td><td class="num">17<br><span style="color:var(--ink-3);font-size:12px">16&ndash;18</span></td><td class="num">12<br><span style="color:var(--ink-3);font-size:12px">10&ndash;14</span></td><td class="num best">7.7<br><span style="color:var(--ink-3);font-size:12px">7.6&ndash;7.8</span></td></tr><tr><td><span class="dot" style="background:var(--g3);border-color:var(--e3)"></span><b>3</b> + organics + worms</td><td class="num best">0.24<br><span style="color:var(--ink-3);font-size:12px">0.19&ndash;0.28</span></td><td class="num">43<br><span style="color:var(--ink-3);font-size:12px">40&ndash;50</span></td><td class="num best">29<br><span style="color:var(--ink-3);font-size:12px">24&ndash;36</span></td><td class="num">22<br><span style="color:var(--ink-3);font-size:12px">21&ndash;24</span></td><td class="num">31<br><span style="color:var(--ink-3);font-size:12px">30&ndash;33</span></td><td class="num">16<br><span style="color:var(--ink-3);font-size:12px">11&ndash;19</span></td><td class="num">13<br><span style="color:var(--ink-3);font-size:12px">12&ndash;14</span></td><td class="num">7.8<br><span style="color:var(--ink-3);font-size:12px">7.6&ndash;7.9</span></td></tr><tr><td><span class="dot" style="background:var(--g4);border-color:var(--e4)"></span><b>4</b> + organics + castings</td><td class="num">0.19<br><span style="color:var(--ink-3);font-size:12px">0.16&ndash;0.23</span></td><td class="num">40<br><span style="color:var(--ink-3);font-size:12px">30&ndash;50</span></td><td class="num">29<br><span style="color:var(--ink-3);font-size:12px">27&ndash;33</span></td><td class="num best">23<br><span style="color:var(--ink-3);font-size:12px">23&ndash;24</span></td><td class="num">31<br><span style="color:var(--ink-3);font-size:12px">29&ndash;34</span></td><td class="num best">18<br><span style="color:var(--ink-3);font-size:12px">11&ndash;26</span></td><td class="num best">13<br><span style="color:var(--ink-3);font-size:12px">11&ndash;15</span></td><td class="num">7.7<br><span style="color:var(--ink-3);font-size:12px">7.6&ndash;7.8</span></td></tr><tr class="ref"><td><span class="dot" style="background:var(--g5);border-color:var(--e5)"></span><b>5</b> Potting soil <span style="color:var(--ink-3);font-weight:500">· the target</span></td><td class="num">0.76<br><span style="color:var(--ink-3);font-size:12px">0.70&ndash;0.82</span></td><td class="num">87<br><span style="color:var(--ink-3);font-size:12px">80&ndash;100</span></td><td class="num">66<br><span style="color:var(--ink-3);font-size:12px">61&ndash;71</span></td><td class="num">51<br><span style="color:var(--ink-3);font-size:12px">49&ndash;54</span></td><td class="num">58<br><span style="color:var(--ink-3);font-size:12px">56&ndash;61</span></td><td class="num">54<br><span style="color:var(--ink-3);font-size:12px">38&ndash;65</span></td><td class="num">36<br><span style="color:var(--ink-3);font-size:12px">34&ndash;38</span></td><td class="num">6.6<br><span style="color:var(--ink-3);font-size:12px">6.5&ndash;6.6</span></td></tr></tbody></table></div><p class="cap">Big number is the group's average; the smaller pair under it is the lightest and heaviest of its three cups. A <b>highlighted</b> cell is simply the <b>highest</b> of the four regolith groups for that measurement: group 5 is ordinary potting soil, the target rather than a competitor, so it is left out of the running. Highest is not the same as meaningfully better: whether a difference counts is decided at the top of this page, not here.</p>
+
+  <h2>Was the data any good?</h2>
+  <p class="lede">These checks run before any answer is worked out. A report
+  that cannot tell you what is missing should not be trusted about what is
+  there.</p>
+  <div class="note"><b>Every check passed.</b> All 15 cups are described. Every group has 3 final weights. No missing weekly measurements.</div>
+
+  <div class="end"><span>end of report</span></div>
+</div>
+
+<script>
+// ---- light / dark switch ----
+(function () {
+  const btn = document.getElementById("themeBtn");
+  const SUN = '<svg viewBox="0 0 24 24"><path d="M12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-13a1 1 0 0 1-1-1V1a1 1 0 0 1 2 0v2a1 1 0 0 1-1 1zm0 20a1 1 0 0 1-1-1v-2a1 1 0 0 1 2 0v2a1 1 0 0 1-1 1zM4 13H2a1 1 0 0 1 0-2h2a1 1 0 0 1 0 2zm18 0h-2a1 1 0 0 1 0-2h2a1 1 0 0 1 0 2zM5.6 6.99 4.2 5.58A1 1 0 0 1 5.61 4.17L7.02 5.58A1 1 0 1 1 5.6 6.99zm12.8 12.8-1.41-1.41a1 1 0 0 1 1.41-1.41l1.41 1.41a1 1 0 0 1-1.41 1.41zM6.99 18.4 5.58 19.8a1 1 0 0 1-1.41-1.41l1.41-1.41A1 1 0 1 1 6.99 18.4zM19.8 5.58 18.4 6.99a1 1 0 0 1-1.41-1.41L18.4 4.17a1 1 0 0 1 1.41 1.41z"/></svg>';
+  const MOON = '<svg viewBox="0 0 24 24"><path d="M12.3 22C6.6 22 2 17.4 2 11.7 2 6.9 5.3 2.8 9.9 1.7a1 1 0 0 1 1.1 1.5 7.6 7.6 0 0 0 9.7 10.6 1 1 0 0 1 1.3 1.3A10.3 10.3 0 0 1 12.3 22z"/></svg>';
+
+  // The page is light-first, so an unset theme means "whatever the OS says",
+  // and the OS default here is light.
+  const prefersDark = window.matchMedia
+    ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+
+  function current() {
+    const set = document.documentElement.getAttribute("data-theme");
+    if (set) return set;
+    return prefersDark && prefersDark.matches ? "dark" : "light";
+  }
+  function paint() {
+    const dark = current() === "dark";
+    btn.innerHTML = dark ? SUN : MOON;      // show what you will GET
+    btn.title = dark ? "Switch to light" : "Switch to dark";
+    btn.setAttribute("aria-label", btn.title);
+  }
+  btn.addEventListener("click", () => {
+    const next = current() === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    try { localStorage.setItem("marsworm-theme", next); } catch (e) {}
+    paint();
+  });
+  try {
+    const saved = localStorage.getItem("marsworm-theme");
+    if (saved) document.documentElement.setAttribute("data-theme", saved);
+  } catch (e) {}
+  if (prefersDark) prefersDark.addEventListener("change", paint);
+  paint();
+})();
+
+// ---- fullscreen toggle, YouTube-style ----
+(function () {
+  const btn = document.getElementById("fullscreenBtn");
+  const ENTER = '<svg viewBox="0 0 24 24"><path d="M3 3h6v2H5v4H3V3zm12 0h6v6h-2V5h-4V3zM3 15h2v4h4v2H3v-6zm16 4h-4v2h6v-6h-2v4z"/></svg>';
+  const EXIT  = '<svg viewBox="0 0 24 24"><path d="M5 16H3v5h5v-2H5v-3zm-2-8h2V5h3V3H3v5zm14 11h-3v2h5v-5h-2v3zM14 3v2h3v3h2V3h-5z"/></svg>';
+
+  function isFullscreen() {
+    return !!(document.fullscreenElement || document.webkitFullscreenElement ||
+              document.mozFullScreenElement || document.msFullscreenElement);
+  }
+  async function enter() {
+    const el = document.documentElement;
+    const req = el.requestFullscreen || el.webkitRequestFullscreen ||
+                el.mozRequestFullScreen || el.msRequestFullscreen;
+    if (req) await req.call(el);
+    // NOTE: no navigator.keyboard.lock() here, deliberately. The Mission Map
+    // locks Escape because it has popups that need to swallow the first press.
+    // This page has none, so locking Escape would only break the one thing
+    // everybody expects it to do -- leave fullscreen.
+  }
+  function exit() {
+    if (isFullscreen()) {
+      const ex = document.exitFullscreen || document.webkitExitFullscreen ||
+                 document.mozCancelFullScreen || document.msExitFullscreen;
+      if (ex) ex.call(document);
+    }
+  }
+  function paint() {
+    if (isFullscreen()) {
+      btn.innerHTML = EXIT;
+      btn.title = "Exit full screen";
+      btn.setAttribute("data-fullscreen", "true");
+    } else {
+      btn.innerHTML = ENTER + '<span class="fs-label">Full screen</span>';
+      btn.title = "Full screen";
+      btn.removeAttribute("data-fullscreen");
+    }
+  }
+  btn.addEventListener("click", () => {
+    isFullscreen() ? exit() : enter();
+    btn.blur();          // otherwise the ring lingers and reads as "active"
+  });
+  ["fullscreenchange", "webkitfullscreenchange", "mozfullscreenchange",
+   "MSFullscreenChange"].forEach(ev => document.addEventListener(ev, paint));
+  paint();
+})();
+</script>
+</body>
+</html>

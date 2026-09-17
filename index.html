@@ -1,298 +1,162 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- The landing page at the root of the site. One page, hand-written, listing
+     every version of the project. build_site.py fills in site.css?v=5619b9e6a8, https://saanvipagadala.github.io/MarsWorm
+     and v2-earth-microbes-at-work and copies it to site/index.html. Each version below is
+     a complete site of its own in its own folder; add a row here when a new
+     one is added. -->
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="generator" content="pandoc" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover" />
-  <title>MarsWorm</title>
-  <style>
-    /* Default styles provided by pandoc.
-    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
-    */
-    code{white-space: pre-wrap;}
-    span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
-    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
-    ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
-      width: 0.8em;
-      margin: 0 0.8em 0.2em -1.6em;
-      vertical-align: middle;
-    }
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
-  </style>
-  <link rel="stylesheet" href="site.css?v=3a3a16aec5" />
-  <meta name="color-scheme" content="light">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
-  <script>
-  /* Before anything else on the page: a reopened tab is otherwise restored to
-     wherever it was left, which opens the page below its own nav bar with the
-     heading cut in half. Set from the head, because by the end of the body the
-     browser has already done it. */
-  try { if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; } catch (e) {}
-  </script>
-  <meta name="description" content="Designing an organism to make soil from Martian dirt. A student project for the 3M Young Scientist Challenge 2027.">
-  <link rel="canonical" href="https://saanvipagadala.github.io/MarsWorm/">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="MarsWorm">
-  <meta property="og:title" content="MarsWorm">
-  <meta property="og:description" content="Designing an organism to make soil from Martian dirt. A student project for the 3M Young Scientist Challenge 2027.">
-  <meta property="og:url" content="https://saanvipagadala.github.io/MarsWorm/">
-  <meta property="og:image" content="https://saanvipagadala.github.io/MarsWorm/og-image.png">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="MarsWorm · designing an organism to make soil from Martian dirt">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="MarsWorm">
-  <meta name="twitter:description" content="Designing an organism to make soil from Martian dirt. A student project for the 3M Young Scientist Challenge 2027.">
-  <meta name="twitter:image" content="https://saanvipagadala.github.io/MarsWorm/og-image.png">
-  <meta name="theme-color" content="#b3401f">
-  <link rel="icon" type="image/svg+xml" href="marsworm.svg">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>MarsWorm</title>
+<meta name="description" content="Making soil out of Martian dirt. A student project for the 3M Young Scientist Challenge 2027, with every version of the design kept side by side.">
+<link rel="canonical" href="https://saanvipagadala.github.io/MarsWorm/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="MarsWorm">
+<meta property="og:title" content="MarsWorm">
+<meta property="og:description" content="Making soil out of Martian dirt. A student project for the 3M Young Scientist Challenge 2027, with every version of the design kept side by side.">
+<meta property="og:url" content="https://saanvipagadala.github.io/MarsWorm/">
+<meta property="og:image" content="https://saanvipagadala.github.io/MarsWorm/v2-earth-microbes-at-work/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="MarsWorm">
+<meta name="twitter:image" content="https://saanvipagadala.github.io/MarsWorm/v2-earth-microbes-at-work/og-image.png">
+<meta name="theme-color" content="#b3401f">
+<link rel="icon" type="image/svg+xml" href="marsworm.svg">
+<link rel="apple-touch-icon" href="v2-earth-microbes-at-work/apple-touch-icon.png">
+<link rel="stylesheet" href="site.css?v=5619b9e6a8">
+<style>
+  /* Only this page: the version table wants a little more room than the
+     reading column, and its first column should not wrap. */
+  .versions > table { min-width: 36rem; }
+  .versions td:first-child { white-space: nowrap; }
+  .versions td:first-child a { font-weight: 700; }
+  .versions .newest {
+    font-family: var(--sans); font-size: 0.6rem; font-weight: 700;
+    letter-spacing: 0.06em; color: var(--gold); text-transform: uppercase;
+    display: block; margin-top: 0.2rem;
+  }
+  /* On a phone four columns are four ribbons. Each row becomes a card: the
+     version name on top, then the three cells one under another, each
+     labelled with its column heading. */
+</style>
 </head>
 <body>
-<nav class="nav"><a class="brand" href="index.html"><img src="marsworm.svg" alt=""><span class="wordmark"><b>MarsWorm</b><span class="ver">v0.5</span></span></a><button class="menu" type="button" aria-label="Menu" aria-expanded="false" aria-controls="nav-links"><span></span><span></span><span></span></button><div class="links" id="nav-links"><a href="index.html" class="here">Overview</a><a href="review.html">Design review</a><a href="host.html">Host question</a><a href="lab.html">Lab request</a><a href="end-to-end.html">End to end</a></div></nav><main class="page">
-<h1 id="marsworm">MarsWorm</h1>
+<nav class="nav">
+  <a class="brand" href="index.html">
+    <img src="marsworm.svg" alt="">
+    <span class="wordmark"><b>MarsWorm</b></span>
+  </a>
+  <button class="menu" type="button" aria-label="Menu"
+          aria-expanded="false" aria-controls="nav-links">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="links" id="nav-links">
+    <a href="v2-earth-microbes-at-work/index.html">V2. Earth microbes at work</a>
+    <a href="v1-bioengineered-organism/index.html">V1. The bioengineered organism</a>
+    <a href="podcast.html">Podcast</a>
+  </div>
+</nav>
+<main class="page">
+
+<h1>MarsWorm</h1>
+
 <div class="hero">
 <figure class="portrait">
 <img src="images/saanvi.jpg" alt="Saanvi" />
-<figcaption>
-Saanvi
-</figcaption>
+<figcaption>Saanvi</figcaption>
 </figure>
 <div>
 <p><strong>Designing a microbe that could do an earthworm’s job on
 Mars.</strong></p>
 <p><strong>MarsWorm</strong> stands for <strong>M</strong>aking
-<strong>A</strong>rid <strong>R</strong>egolith into
-<strong>S</strong>oil, <strong>W</strong>ith <strong>O</strong>rganisms
-<strong>R</strong>edesigned for <strong>M</strong>ars.</p>
+<strong>A</strong>rid <strong>R</strong>egolith into <strong>S</strong>oil,
+<strong>W</strong>ith <strong>O</strong>rganisms <strong>R</strong>edesigned
+for <strong>M</strong>ars.</p>
 <p>A student project for the <strong>3M Young Scientist Challenge
 2027</strong>.</p>
 </div>
 </div>
+
 <hr />
+
 <figure class="fig">
 <img src="images/regolith_to_soil.png" alt="Three panels of ground, drawn by
 hand. Left: pale rusty Martian regolith with a seed lying in it and nothing
 happening. Middle: the same ground with microbes working through it and dark
 patches beginning. Right: dark soil, with worm castings, microbes still in it,
 and the seed grown into a seedling.">
-<figcaption>
-Everything below is an attempt to build the middle panel.
-</figcaption>
+<figcaption>Every version below is an attempt to build the middle
+panel.</figcaption>
 </figure>
+
 <hr />
-<h2 id="the-problem">The problem</h2>
-<p>A Mars crew would eat about half a ton of food per person per year,
-and ships can only leave Earth for Mars about every 26 months. You
-cannot pack enough lunch. Any colony that stays has to grow its own
-food, and growing food needs soil.</p>
-<p><strong>Mars has dirt. Mars does not have soil.</strong> Martian
-regolith is crushed rock. It has no dead plant matter, no living
-microbes, no nitrogen a plant can take up, and about 0.5–1% perchlorate
-salt, which is poisonous. Plant a seed in it and nothing happens.</p>
-<p>So the real job is not farming on Mars. It is <strong>making soil on
-Mars</strong>, using something that copies itself, because shipping soil
-from Earth is the same weight problem all over again.</p>
-<p>On Earth, an earthworm does this job, and most of the chemistry is
-really done by the microbes in its gut. On Mars an earthworm dies
-immediately: it freezes, it dries out, the radiation damages it, the
-perchlorate poisons it, and there is nothing for it to eat.</p>
-<h2 id="the-two-requirements">The two requirements</h2>
-<p>Anything that could make soil on Mars has to satisfy <strong>two
-separate requirements at the same time</strong>, and they have nothing
-to do with each other.</p>
-<ul>
-<li><strong>Requirement 1: do the work.</strong> Break down dead
-material, unlock the nitrogen, iron and phosphorus that are trapped in
-the rock, and leave behind something a root can actually grow through.
-This is the earthworm’s job, and it is scored here against <strong><a
-href="phases/1-searching-earth-for-MarsWorm/results/the_map-notes.html#soil-enrichment--10-jobs">10
-specific abilities</a></strong>.</li>
-<li><strong>Requirement 2: stay alive while doing it.</strong> At about
-−60 °C, with almost no water, no oxygen worth breathing, radiation
-coming straight through the thin atmosphere, perchlorate salt in the
-ground, and nothing to eat. Scored against <strong><a
-href="phases/1-searching-earth-for-MarsWorm/results/the_map-notes.html#survival-on-mars--13-jobs">13
-specific abilities</a></strong>.</li>
-</ul>
-<p>Plenty of organisms on Earth are excellent at one of these. Every one
-of them is a specialist. The question is whether anything is good at
-<strong>both</strong>, because a champion at one and a failure at the
-other is no use on Mars.</p>
-<div class="strip">
-<figure>
-<img src="images/earthworm.jpg" alt="Earthworm" />
-<figcaption>
-<b>Earthworm</b><br/>Does the work. Dies on Mars within minutes.
-</figcaption>
-</figure>
-<figure>
-<img src="images/deinococcus_radiodurans.jpg" alt="Deinococcus radiodurans" />
-<figcaption>
-<b><i>Deinococcus radiodurans</i></b><br/>Survives radiation that kills
-anything else. Does nothing for soil.
-</figcaption>
-</figure>
-<figure>
-<img src="images/azotobacter_vinelandii.jpg" alt="Azotobacter vinelandii" />
-<figcaption>
-<b><i>Azotobacter vinelandii</i></b><br/>A soil bacterium that already
-carries 13 of the 37 genes.
-</figcaption>
-</figure>
+
+<h2>The problem</h2>
+
+<p>Mars has dirt, not soil. This project looks for a <strong>biological
+answer</strong>: microbes that turn Martian dirt into soil as fertile as
+Earth's, and can live there while they do it.
+<a href="v1-bioengineered-organism/index.html#the-problem">The full problem
+&rarr;</a></p>
+
+<h2>One project, more than one answer</h2>
+
+<p>Each time we tested a design, it changed. More than one answer came out,
+each strong in some ways and weak in others, so we keep all of them. Every
+version is a complete site of its own.</p>
+
+<div class="tablewrap versions">
+<table>
+<thead>
+<tr><th>Version</th><th>What it is</th><th>Strong points</th><th>Weak points</th></tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="v2-earth-microbes-at-work/index.html">V2. Earth microbes at work</a>
+<span class="newest">Newest</span></td>
+<td>Three ordinary Earth microbes and a box of Earth worms,
+inside a Martian dome. No genetic changes.</td>
+<td>Every piece exists. Can be built and tested with little
+effort.</td>
+<td>Needs hardware from Earth. Only works inside a Martian
+habitat. Does not design a new organism.</td>
+</tr>
+<tr>
+<td><a href="v1-bioengineered-organism/index.html">V1. The bioengineered organism</a></td>
+<td>One microbe redesigned with 37 real genes, to do an
+earthworm's job and survive Mars on its own.</td>
+<td>Answers the original question. One living thing,
+no machinery.</td>
+<td>Cannot be built yet. Failed in simulation.</td>
+</tr>
+</tbody>
+</table>
 </div>
-<h2 id="what-the-project-has-done-so-far">What the project has done so
-far</h2>
-<ul>
-<li><p><strong>Step 1: search Earth first.</strong> Before designing
-anything, we went through the organisms on Earth whose genomes have been
-sequenced, looking for one that already does this. <strong><a
-href="phases/1-searching-earth-for-MarsWorm/results/the_map.html">322 of
-them</a> meet part of one requirement or the other. Not one meets both
-in full.</strong></p></li>
-<li><p><strong>Step 2: build the list of parts.</strong> If no single
-organism can do both, borrow from the ones that each do a piece. Every
-ability in the two requirements was traced back to a real gene in a real
-organism that already uses it. That comes to <strong>37 genes in
-all</strong>, and between them they cover both requirements
-completely.</p></li>
-<li><p><strong>Step 3: pick something to put them in.</strong> <a
-href="https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=354"><strong><em>Azotobacter
-vinelandii</em></strong></a> is an ordinary soil bacterium that already
-pulls nitrogen out of the air, and it turns out to carry <strong>13 of
-the 37 genes</strong> by itself. Starting from a bacterium that is
-already a third of the way there leaves <strong>24 genes to
-add</strong>.</p></li>
-<li><p><strong>Step 4: test the foundations.</strong> Steps 2 and 3 rest
-on two assumptions that have never been tested, so there is an
-experiment for each. Both are written up and ready to run.</p>
-<ul>
-<li><strong>Assumption 1: we are assuming that adding life to dead dirt
-turns it into soil.</strong> Nobody has shown that it does. So we fill
-fifteen cups with <a
-href="https://www.amazon.com/Regolith-Simulant-Authentic-Martian-Replicant/dp/B0D94YYYG7">MGS-1
-Martian regolith simulant</a>, give each a different amount of “life”:
-nothing, dead leaves, leaves plus live compost worms, or leaves plus
-worm castings. Then sow radish seeds and weigh the dried seedlings.
-Leaves alone against leaves plus worms is the pair that matters:
-<strong>if the cups with living worms grow the heaviest seedlings, life
-is what turns dead dirt into soil.</strong></li>
-<li><strong>Assumption 2: we are assuming that an ability comes along
-with its gene.</strong> That has never been checked here either. To find
-out, we compare two strains of <em>C. elegans</em> roundworm: a normal
-one, and a ready-made one with the drying-protection gene switched off.
-Half the worms of each strain are dried out first, and then every group
-is hit with UV light, freezing or Martian dust and the survivors counted
-a day later. Drying should protect the normal worms. <strong>Thus, if
-that protection disappears in the strain missing the gene, it would
-prove that the ability really does travel with the gene.</strong></li>
-</ul></li>
-<li><p><strong>Step 5: plan the build.</strong> Adding the 24 genes to
-<em>Azotobacter vinelandii</em> would make a genetically modified
-bacterium carrying all 37. That would be the first thing to meet
-<strong>both</strong> requirements at once: it does the work of turning
-dead rock into soil, and it survives the conditions while doing it. That
-organism is what the project is named after. <strong>MarsWorm</strong>:
-an earthworm’s job, done by a microbe, on Mars.</p>
-<p>The genes would go in as <strong>six groups, one group at a
-time</strong>, and each group has to pass its own test before the next
-is ordered. If a group fails, it costs one group and not the whole
-organism.</p></li>
-</ul>
-<p><small>Each stage in full: <a
-href="phases/1-searching-earth-for-MarsWorm/README.html">Stage 1</a> ·
-<a href="phases/2-designing-MarsWorm/README.html">Stage 2</a> · <a
-href="phases/3-testing-biology-enriches-dirt/README.html">Stage 3</a> ·
-<a href="phases/4-testing-genes-enable-survival/README.html">Stage 4</a>
-· <a href="phases/5-building-MarsWorm/README.html">Stage 5</a> · <a
-href="phases/6-testing-marsworm-in-dirt/README.html">Stage 6</a> · or <a
-href="end-to-end.html">all six at once</a></small></p>
-<h2 id="the-two-things-being-asked-for">The two things being asked
-for</h2>
-<ul>
-<li><strong>Ask 1: would you be willing to read the design and tell us
-where it falls down?</strong> About 30 minutes, and there are three
-specific questions rather than a general request for thoughts. If your
-answer is that it will not work, that is genuinely the most useful thing
-we could hear, and we would write it up as a finding.</li>
-<li><strong>Ask 2: would your lab consider hosting a student for a few
-hours a day, a couple of days a week?</strong> Only for the two
-experiments described above. The cups mostly just sit on a shelf between
-visits, so the time actually spent in the lab is short, and we can fit
-it around whatever suits you. <strong>Both are BSL-1 and neither
-involves any genetic modification.</strong> One is compost worms in
-cups; the other compares two roundworm strains ordered from a stock
-centre. Nothing is engineered or built, and we would bring our own
-materials.</li>
-</ul>
-<p>Lastly, please know that <strong>we are not asking anyone to build
-the microbe.</strong> We understand that would be a serious research
-project in its own right, and far more than it would be fair to ask of
-anyone. It is shared here simply as a design, in the hope that people
-who know this territory far better than we do might be kind enough to
-tell us where it goes wrong.</p>
-<hr />
-<p class="sig">
-<b>Saanvi Pagadala</b> · Granite Bay, CA
-</p>
+
+<h2 id="listen-instead">Listen instead</h2>
+
+<p>The whole project is also a <a href="podcast.html">short podcast series</a>:
+five episodes of about five minutes, two hosts, starting from why Mars has no
+soil. A quicker way in than reading, and it points back here for the detail.</p>
+
 </main>
 
-<!-- Printed at the foot of every page of the site. Mirrors the footer line
-     stamped on the PDFs, and carries the byline that the PDFs put inline. -->
 <footer class="foot">
   <p class="line">MarsWorm &nbsp;·&nbsp; Making Arid Regolith into Soil, With
-    Organisms Redesigned for Mars &nbsp;·&nbsp; v0.5</p>
+    Organisms Redesigned for Mars</p>
   <p class="who"><b>Saanvi Pagadala</b> · Granite Bay, CA</p>
 </footer>
 
-<!-- The sticky nav covers whatever a #section link scrolls to, so every
-     heading carries a scroll margin the height of that bar. The bar is not
-     one height: it wraps as the window narrows, and no CSS breakpoint
-     predicts that reliably, so the page measures it and writes the real
-     number into --nav-h. -->
-<script>
-(function () {
-  var nav = document.querySelector('.nav');
-  if (!nav) return;
-  function measure() {
-    document.documentElement.style.setProperty(
-      '--nav-h', nav.getBoundingClientRect().height + 'px');
-  }
-  measure();
-  addEventListener('load', measure);
-  addEventListener('resize', measure);
-
-  // Reopening a tab, iOS lays the page out at the full height of the screen
-  // and draws its own address bar and toolbar on top of it, so the first
-  // hundred points or so of the page sit behind the browser's furniture. The
-  // page is not scrolled: scrollY, scrollingElement.scrollTop and the sticky
-  // bar's own position all read 0. Nothing in script can give those points
-  // back -- a one-pixel scroll to make Safari settle its bars leaves the
-  // viewport at 932 of 932 -- so the page steps its content down instead.
-  //
-  // The tell is the viewport height. Opened normally it is well short of the
-  // screen, because the bars take their share; behind the bars it is the
-  // whole screen exactly.
-  var touch = 'ontouchstart' in window;
-  function bars() {
-    var hidden = touch && window.innerHeight >= screen.height - 1;
-    document.documentElement.classList.toggle('bars-over', hidden);
-  }
-  bars();
-  addEventListener('resize', bars);
-  addEventListener('orientationchange', bars);
-  addEventListener('pageshow', bars);
-})();
-</script>
-
+<!-- The tab menu button, on small screens. A component of its own: the build
+     appends it to every page it makes, and the two hand-written pages at the
+     root include it too, so the nav behaves the same everywhere. Do not paste
+     this into a page by hand; include it. -->
 <!-- The menu button, on small screens. Every listener is on the document
      rather than on the button, because the markup around it can be replaced
      the whole nav when it swaps a page in, and a listener bound to the old
@@ -328,52 +192,11 @@ tell us where it goes wrong.</p>
 })();
 </script>
 
-<!-- The organism thumbnails in the gene tables. Hovering one shows the
-     picture at a size worth looking at. The preview is attached to the page
-     rather than to the cell, because a table scrolls inside its own box and
-     that box clips anything that grows out of it. Delegated, so it survives
-     the page changing underneath it. -->
-<script>
-(function () {
-  var box, img, cap;
 
-  function build() {
-    box = document.createElement('div');
-    box.id = 'orgpreview';
-    box.hidden = true;
-    img = document.createElement('img');
-    cap = document.createElement('b');
-    box.appendChild(img);
-    box.appendChild(cap);
-    document.body.appendChild(box);
-  }
-
-  function show(thumb) {
-    if (!box) build();
-    img.src = thumb.src;
-    cap.textContent = thumb.title || '';
-    box.hidden = false;
-    // Above the thumbnail by preference, below it when there is no room, and
-    // never off the right edge.
-    var r = thumb.getBoundingClientRect(), w = box.offsetWidth, h = box.offsetHeight;
-    var left = Math.min(Math.max(8, r.left - 8), innerWidth - w - 8);
-    var top = r.top - h - 8;
-    if (top < 8) top = Math.min(r.bottom + 8, innerHeight - h - 8);
-    box.style.left = left + 'px';
-    box.style.top = top + 'px';
-  }
-
-  function hide() { if (box) box.hidden = true; }
-
-  document.addEventListener('mouseover', function (e) {
-    var t = e.target;
-    if (t && t.classList && t.classList.contains('orgpic')) show(t);
-    else if (box && !box.hidden) hide();
-  });
-  addEventListener('scroll', hide, true);
-  addEventListener('keydown', function (e) { if (e.key === 'Escape') hide(); });
-})();
-</script>
+<!-- The fullscreen button and the router that keeps fullscreen across links.
+     A component of its own: the build appends it to every page it makes, and
+     the landing page includes it too, so every page on the site offers the
+     same button. Do not paste this into a page by hand; include it. -->
 
 <!-- Fullscreen, the way a video player offers it: a quiet corner button that
      gets the browser's own furniture out of the way for reading. Written by
@@ -540,5 +363,6 @@ tell us where it goes wrong.</p>
   wireFolds();
 })();
 </script>
+
 </body>
 </html>
