@@ -1,0 +1,9 @@
+flask_id,level,gene,cells,chloride_mg_per_l_target,bench_position,liquid_ml,headspace_ml,date_started
+F01,A,yes,yes,1200,4,,,
+F02,A,yes,yes,1200,2,,,
+F03,B,no,yes,1200,1,,,
+F04,B,no,yes,1200,5,,,
+F05,C,yes,yes,0,6,,,
+F06,C,yes,yes,0,3,,,
+F07,D,yes,no,1200,8,,,
+F08,D,yes,no,1200,7,,,

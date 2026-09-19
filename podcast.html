@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<!-- The podcast page, one of the two hand-written pages at the root of the
+     site. build_site.py fills in site.css?v=fb9d21a217, https://saanvipagadala.github.io/MarsWorm and v3-earth-microbes-no-plumbing and copies it
+     to site/podcast.html. The audio files themselves are built by
+     podcast/build_series.py and land in site/podcast/; add an episode here
+     when one is added there. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>MarsWorm · Podcast</title>
+<meta name="description" content="The MarsWorm project as a short podcast series: five episodes of about five minutes each, on making soil out of Martian dirt.">
+<link rel="canonical" href="https://saanvipagadala.github.io/MarsWorm/podcast.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="MarsWorm">
+<meta property="og:title" content="MarsWorm · Podcast">
+<meta property="og:description" content="The MarsWorm project as a short podcast series: five episodes of about five minutes each, on making soil out of Martian dirt.">
+<meta property="og:url" content="https://saanvipagadala.github.io/MarsWorm/podcast.html">
+<meta property="og:image" content="https://saanvipagadala.github.io/MarsWorm/v3-earth-microbes-no-plumbing/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="MarsWorm · Podcast">
+<meta name="twitter:image" content="https://saanvipagadala.github.io/MarsWorm/v3-earth-microbes-no-plumbing/og-image.png">
+<meta name="theme-color" content="#b3401f">
+<link rel="icon" type="image/svg+xml" href="marsworm.svg">
+<link rel="apple-touch-icon" href="v3-earth-microbes-no-plumbing/apple-touch-icon.png">
+<link rel="stylesheet" href="site.css?v=fb9d21a217">
+<style>
+  /* The episode list. An <ol> so it is a numbered series to a screen reader
+     too, with the markers turned off because each heading carries its own
+     number. */
+  .series { list-style: none; padding: 0; margin: 1.25rem 0; }
+  /* A rule above each episode separates them. The last one needs none below
+     it, because the section break under the list already closes it. */
+  .series li { padding: 0.9rem 0; border-top: 1px solid var(--rule); }
+  .series h3 { margin: 0 0 0.2rem; font-size: 1.02rem; text-align: center; }
+  /* Where the episode sits in the project, before what it is about. Quieter
+     than the title it introduces, so the title is still what gets read. */
+  .series .tag {
+    display: block; font-family: var(--sans); font-size: 0.64rem;
+    font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--ink-3); margin-bottom: 0.15rem;
+  }
+  .series p { margin: 0 0 0.6rem; color: var(--ink-2); text-align: center; }
+  .series audio, .complete { width: 100%; max-width: 30rem; display: block;
+    margin-inline: auto; }
+  /* Playback speed. The browsers that offer this at all bury it in a
+     context menu, and some offer nothing, so the page carries its own. */
+  .speed {
+    display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center;
+    justify-content: center; margin: 0.35rem 0 0;
+    font-family: var(--sans); font-size: 0.62rem;
+  }
+  .speed span {
+    color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.06em;
+    margin-right: 0.1rem; opacity: 0.75;
+  }
+  .speed button {
+    font: inherit; color: var(--ink-3); background: transparent;
+    border: 1px solid transparent; border-radius: 999px;
+    padding: 0.08rem 0.36rem; cursor: pointer; line-height: 1.45;
+  }
+  .speed button:hover { color: var(--ink-2); border-color: var(--rule); }
+  .speed button.on { color: var(--ink-2); border-color: var(--ink-3); }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a class="brand" href="index.html">
+    <img src="marsworm.svg" alt="">
+    <span class="wordmark"><b>MarsWorm</b></span>
+  </a>
+  <button class="menu" type="button" aria-label="Menu"
+          aria-expanded="false" aria-controls="nav-links">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="links" id="nav-links">
+    <a href="v2-earth-microbes-at-work/index.html">V2. Earth microbes at work</a>
+    <a href="v1-bioengineered-organism/index.html">V1. The bioengineered organism</a>
+    <a href="podcast.html" class="here">Podcast</a>
+  </div>
+</nav>
+<main class="page">
+
+<h1>The podcast</h1>
+
+<p>This is the whole website, as a podcast. It is the quickest way to get the
+whole story, and the most enjoyable.</p>
+
+<p>Could anything alive do an earthworm's job on Mars? Nothing on Earth can.
+So the project bioengineers an organism from 37 borrowed genes. Then it tests that
+organism in a computer simulation, under Martian conditions. Most of the design
+does not survive. So the project pivots. Version 2 uses ordinary
+Earth microbes and some plumbing. Three bacteria and a box of worms.
+Nothing bioengineered, and every piece of it exists today.</p>
+
+<p>Twenty three minutes, five episodes, two hosts. Start at the first one. If
+you run a lab, 3 and 5 are the experiments you would be hosting.</p>
+
+<ol class="series">
+<li>
+<h3><span class="tag">1. The problem:</span> Mars has dirt, not soil</h3>
+<p>Why a colony cannot ship its food or its soil, and why the job on Earth belongs to the earthworm.</p>
+<audio controls preload="none" controlsList="nodownload noplaybackrate noremoteplayback" disableremoteplayback src="podcast/1-mars-has-dirt-not-soil.mp3">
+  <a href="podcast/1-mars-has-dirt-not-soil.mp3">Download episode 1 (MP3)</a>
+</audio>
+</li>
+<li>
+<h3><span class="tag">2. Version 1, the design:</span> Building an organism from 37 borrowed genes</h3>
+<p>Earth was searched first. The best organism on it managed 14 of the 23 abilities the job needs.</p>
+<audio controls preload="none" controlsList="nodownload noplaybackrate noremoteplayback" disableremoteplayback src="podcast/2-thirty-seven-borrowed-genes.mp3">
+  <a href="podcast/2-thirty-seven-borrowed-genes.mp3">Download episode 2 (MP3)</a>
+</audio>
+</li>
+<li>
+<h3><span class="tag">3. Version 1, the experiments:</span> The two assumptions nobody has checked</h3>
+<p>Fifteen cups of worms, and a roundworm with one gene switched off. What a lab would actually run.</p>
+<audio controls preload="none" controlsList="nodownload noplaybackrate noremoteplayback" disableremoteplayback src="podcast/3-two-assumptions-nobody-checked.mp3">
+  <a href="podcast/3-two-assumptions-nobody-checked.mp3">Download episode 3 (MP3)</a>
+</audio>
+</li>
+<li>
+<h3><span class="tag">4. Version 2, the pivot:</span> The simulation that broke the design</h3>
+<p>Fed only what Mars really has, the chosen organism could not live. A better idea came out of that.</p>
+<audio controls preload="none" controlsList="nodownload noplaybackrate noremoteplayback" disableremoteplayback src="podcast/4-the-simulation-that-broke-it.mp3">
+  <a href="podcast/4-the-simulation-that-broke-it.mp3">Download episode 4 (MP3)</a>
+</audio>
+</li>
+<li>
+<h3><span class="tag">5. Version 2, the experiments:</span> Three questions for an earthworm</h3>
+<p>Can a worm make soil out of regolith, how much perchlorate can it stand, and can it free phosphorus from solid rock? Three experiments, half a metre of shelf.</p>
+<audio controls preload="none" controlsList="nodownload noplaybackrate noremoteplayback" disableremoteplayback src="podcast/5-three-questions-for-an-earthworm.mp3">
+  <a href="podcast/5-three-questions-for-an-earthworm.mp3">Download episode 5 (MP3)</a>
+</audio>
+</li>
+</ol>
+
+<hr />
+
+<h2>Or all at once</h2>
+
+<p>The same ground in one unbroken conversation, forty minutes, for a drive or
+a walk. It covers everything the five episodes do.</p>
+
+<audio class="complete" controls preload="none" controlsList="nodownload noplaybackrate noremoteplayback" disableremoteplayback src="podcast/marsworm-complete.mp3">
+  <a href="podcast/marsworm-complete.mp3">Download the full conversation (MP3)</a>
+</audio>
+
+
+</main>
+
+<footer class="foot">
+  <p class="line">MarsWorm &nbsp;·&nbsp; Making Arid Regolith into Soil, With
+    Organisms Redesigned for Mars</p>
+  <p class="who"><b>Saanvi Pagadala</b> · Granite Bay, CA</p>
+</footer>
+
+<!-- Playback speed, as buttons under each player.
+
+     A browser that offers speed at all hides it in a context menu on the
+     player, and several offer nothing, which is no use to someone who listens
+     at one and a half. The speed chosen applies to every player on the page
+     and is remembered, so moving to the next episode keeps it. A browser
+     resets playbackRate when it loads a source, so it is set again on play
+     as well as on choosing it. -->
+<script>
+(function () {
+  var SPEEDS = [1, 1.25, 1.5, 1.75, 2];
+  var rate = 1;
+  try { rate = parseFloat(localStorage.getItem('mw-rate')) || 1; } catch (e) {}
+
+  function apply() {
+    document.querySelectorAll('audio').forEach(function (a) {
+      a.playbackRate = rate;
+    });
+    document.querySelectorAll('.speed button').forEach(function (b) {
+      b.classList.toggle('on', parseFloat(b.dataset.rate) === rate);
+      b.setAttribute('aria-pressed', parseFloat(b.dataset.rate) === rate);
+    });
+  }
+
+  document.querySelectorAll('audio').forEach(function (audio) {
+    var row = document.createElement('div');
+    row.className = 'speed';
+    row.innerHTML = '<span>Speed</span>';
+    SPEEDS.forEach(function (s) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.dataset.rate = s;
+      b.textContent = (s === 1 ? '1' : String(s)) + '\u00d7';
+      b.addEventListener('click', function () {
+        rate = s;
+        try { localStorage.setItem('mw-rate', s); } catch (e) {}
+        apply();
+      });
+      row.appendChild(b);
+    });
+    audio.insertAdjacentElement('afterend', row);
+    audio.addEventListener('play', function () { audio.playbackRate = rate; });
+    audio.addEventListener('loadedmetadata', function () {
+      audio.playbackRate = rate;
+    });
+  });
+
+  apply();
+})();
+</script>
+
+<!-- One player at a time. Starting an episode pauses whichever one was
+     already going, so the page never talks over itself. The listener sits on
+     the document and uses capture, because a play event does not bubble;
+     that also means it keeps working for players swapped in later. -->
+<script>
+document.addEventListener('play', function (e) {
+  document.querySelectorAll('audio').forEach(function (other) {
+    if (other !== e.target) other.pause();
+  });
+}, true);
+</script>
+
+<!-- The tab menu button, on small screens. A component of its own: the build
+     appends it to every page it makes, and the two hand-written pages at the
+     root include it too, so the nav behaves the same everywhere. Do not paste
+     this into a page by hand; include it. -->
+<!-- The menu button, on small screens. Every listener is on the document
+     rather than on the button, because the markup around it can be replaced
+     the whole nav when it swaps a page in, and a listener bound to the old
+     button would go with it. -->
+<script>
+(function () {
+  function nav() { return document.querySelector('.nav'); }
+
+  function set(open) {
+    var n = nav();
+    if (!n) return;
+    n.classList.toggle('open', open);
+    var b = n.querySelector('.menu');
+    if (b) b.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+
+  // Capture, not bubble. A bubbling listener on the document never hears
+  // some taps on iOS; the capture phase runs from the window down to the
+  // target and always does.
+  document.addEventListener('click', function (e) {
+    var t = e.target;
+    if (!t || !t.closest) return;
+    if (t.closest('.menu')) { set(!nav().classList.contains('open')); return; }
+    // A tab was chosen, or the reader tapped the page behind the panel.
+    // Either way the menu has done its job.
+    set(false);
+  }, true);
+
+  addEventListener('keydown', function (e) { if (e.key === 'Escape') set(false); });
+  // Turning the phone sideways can put the tabs back in the bar, and an open
+  // panel would then be a second copy of them.
+  addEventListener('resize', function () { set(false); });
+})();
+</script>
+
+
+<!-- The fullscreen button and the router that keeps fullscreen across links.
+     A component of its own: the build appends it to every page it makes, and
+     the landing page includes it too, so every page on the site offers the
+     same button. Do not paste this into a page by hand; include it. -->
+
+<!-- Fullscreen, the way a video player offers it: a quiet corner button that
+     gets the browser's own furniture out of the way for reading. Written by
+     script rather than sitting in the markup, because a browser that cannot
+     do it should not be offered it. Desktop only: an iPhone has no fullscreen
+     for a page, and on a tablet the button would sit under a thumb. -->
+<script>
+(function () {
+  var root = document.documentElement;
+  if (!(root.requestFullscreen || root.webkitRequestFullscreen)) return;
+  if ('ontouchstart' in window) return;
+
+  var EXPAND = '<path d="M3 8V3h5M17 3h5v5M22 17v5h-5M8 22H3v-5"/>';
+  var SHRINK = '<path d="M8 3v5H3M22 8h-5V3M17 22v-5h5M3 17h5v5"/>';
+
+  var btn = document.createElement('button');
+  btn.className = 'fs';
+  btn.type = 'button';
+  document.body.appendChild(btn);
+
+  function on() {
+    return !!(document.fullscreenElement || document.webkitFullscreenElement);
+  }
+  function paint() {
+    var label = on() ? 'Leave fullscreen' : 'Read fullscreen';
+    btn.setAttribute('aria-label', label);
+    btn.title = label + '  (F)';
+    btn.innerHTML = '<svg viewBox="0 0 25 25" aria-hidden="true">' +
+                    (on() ? SHRINK : EXPAND) + '</svg>';
+  }
+  function toggle() {
+    if (on()) {
+      (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    } else {
+      (root.requestFullscreen || root.webkitRequestFullscreen).call(root);
+    }
+  }
+
+  btn.addEventListener('click', toggle);
+  document.addEventListener('fullscreenchange', paint);
+  document.addEventListener('webkitfullscreenchange', paint);
+  // The same shortcut a video player uses, but never while something is being
+  // typed into, and never on top of a browser shortcut.
+  addEventListener('keydown', function (e) {
+    if (e.key !== 'f' && e.key !== 'F') return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    var t = e.target;
+    if (t && (t.isContentEditable ||
+              /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+    e.preventDefault();
+    toggle();
+  });
+  paint();
+})();
+</script>
+
+<!-- Fullscreen belongs to a document, so following an ordinary link drops out
+     of it, and the new page cannot ask to go back in: a browser only grants
+     fullscreen on a click, and a fresh document has no click behind it.
+
+     So while fullscreen is on, and only then, a click on a link to another
+     page of this site fetches that page and swaps it in rather than
+     navigating. The document never changes, so fullscreen never ends. Outside
+     fullscreen nothing here runs at all and every link is an ordinary link,
+     which is what keeps this plain static HTML for anyone reading it normally,
+     and what makes the failure of any of it harmless. -->
+<script>
+(function () {
+  var PARTS = ['.nav', '.page', '.foot'];
+
+  function full() {
+    return !!(document.fullscreenElement || document.webkitFullscreenElement);
+  }
+
+  function settle(hash) {
+    // The nav's height and the landing on a #section are both worked out on
+    // load; a swapped-in page has to have them worked out again.
+    var nav = document.querySelector('.nav');
+    if (nav) {
+      document.documentElement.style.setProperty(
+        '--nav-h', nav.getBoundingClientRect().height + 'px');
+    }
+    var el = hash && document.getElementById(decodeURIComponent(hash.slice(1)));
+    // Nothing animates: the stylesheet asks for no smooth scrolling, so these
+    // arrive at once rather than gliding and being interrupted.
+    if (el) el.scrollIntoView(true);
+    else scrollTo(0, 0);
+  }
+
+  function swap(url, push) {
+    fetch(url.href).then(function (r) {
+      if (!r.ok) throw 0;
+      return r.text();
+    }).then(function (text) {
+      var doc = new DOMParser().parseFromString(text, 'text/html');
+      var next = PARTS.map(function (sel) { return doc.querySelector(sel); });
+      if (next.some(function (n) { return !n; })) throw 0;
+      // The URL is changed first: every relative href and src in the incoming
+      // markup is resolved against it, and the pages sit at different depths.
+      if (push) history.pushState({}, '', url.href);
+      PARTS.forEach(function (sel, i) {
+        document.querySelector(sel).replaceWith(next[i]);
+      });
+      document.title = doc.title;
+      if (window.wireFolds) wireFolds();
+      settle(url.hash);
+    }).catch(function () {
+      location.href = url.href;              // give up quietly, navigate
+    });
+  }
+
+  addEventListener('click', function (e) {
+    if (!full() || e.defaultPrevented) return;
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button) return;
+    var a = e.target.closest && e.target.closest('a');
+    if (!a || a.target || a.hasAttribute('download')) return;
+    var url = new URL(a.href, location.href);
+    if (url.origin !== location.origin) return;
+    // Only pages. A .csv or an image is a download or a viewer, and neither
+    // is something to paste into this one.
+    if (!/\.html$/.test(url.pathname)) return;
+    if (url.pathname === location.pathname) return;   // an anchor on this page
+    e.preventDefault();
+    swap(url, true);
+  });
+
+  addEventListener('popstate', function () {
+    if (full()) swap(new URL(location.href), false);
+  });
+})();
+</script>
+
+<script>
+// Foldable groups inside a long table. The heading rows are made by
+// span_category_rows() in the build; everything between one of them and the
+// next (or the totals row) belongs to that group.
+(function () {
+  function body(row) {
+    var out = [], r = row.nextElementSibling;
+    while (r && !r.querySelector('td.catrow') && !r.querySelector('.tot')) {
+      out.push(r); r = r.nextElementSibling;
+    }
+    return out;
+  }
+  window.wireFolds = function () {
+  document.querySelectorAll('td.catrow').forEach(function (cell) {
+    if (cell.dataset.folds) return;            // already wired
+    cell.dataset.folds = '1';
+    var row = cell.parentNode, open = true;
+    cell.setAttribute('role', 'button');
+    cell.setAttribute('tabindex', '0');
+    function toggle() {
+      open = !open;
+      row.classList.toggle('closed', !open);
+      body(row).forEach(function (r) { r.hidden = !open; });
+    }
+    toggle();                                  // start folded
+    cell.addEventListener('click', toggle);
+    cell.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+    });
+  });
+  };
+  wireFolds();
+})();
+</script>
+
+</body>
+</html>
