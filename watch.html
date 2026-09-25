@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<!-- The watch page, one of the three hand-written pages at the root of the
+     site. build_site.py fills in site.css?v=4a63573931, https://saanvipagadala.github.io/MarsWorm and v5-a-plant-on-open-mars and copies
+     it to site/watch.html. The videos, their captions, the audio and the
+     poster images are built by podcast/ and land in site/watch/; add an
+     episode here when one is added there.
+
+     It was called the podcast page while it only had audio on it. A podcast
+     is audio, and nobody reading that word expects two animated hosts, so
+     the page is Watch and site/watch.html is left behind as a stand-in
+     pointing here. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>MarsWorm · Watch</title>
+<meta name="description" content="The MarsWorm project as six short films: the whole story first, then one for each version, with two hosts and the project's own diagrams.">
+<link rel="canonical" href="https://saanvipagadala.github.io/MarsWorm/watch.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="MarsWorm">
+<meta property="og:title" content="MarsWorm · Watch">
+<meta property="og:description" content="The MarsWorm project as six short films: the whole story first, then one for each version, with two hosts and the project's own diagrams.">
+<meta property="og:url" content="https://saanvipagadala.github.io/MarsWorm/watch.html">
+<meta property="og:image" content="https://saanvipagadala.github.io/MarsWorm/v5-a-plant-on-open-mars/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="MarsWorm · Watch">
+<meta name="twitter:image" content="https://saanvipagadala.github.io/MarsWorm/v5-a-plant-on-open-mars/og-image.png">
+<meta name="theme-color" content="#b3401f">
+<link rel="icon" type="image/svg+xml" href="marsworm.svg">
+<link rel="apple-touch-icon" href="v5-a-plant-on-open-mars/apple-touch-icon.png">
+<link rel="stylesheet" href="site.css?v=4a63573931">
+<style>
+  /* The episode list. An <ol> so it is a numbered series to a screen
+     reader too. The markers stay off: the heading carries the version,
+     and a film's number and its version are not the same number. */
+  .series { list-style: none; padding: 0; margin: 1.25rem 0; }
+  /* A rule above each episode separates them. The last one needs none below
+     it, because the section break under the list already closes it. */
+  .series li { padding: 0.9rem 0; border-top: 1px solid var(--rule); }
+  .series h3 { margin: 0 0 0.2rem; font-size: 1.02rem; text-align: center; }
+  /* Where the episode sits in the project, before what it is about. Quieter
+     than the title it introduces, so the title is still what gets read. */
+  .series .tag {
+    display: block; font-family: var(--sans); font-size: 0.64rem;
+    font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--ink-3); margin-bottom: 0.15rem;
+  }
+  .series p { margin: 0 0 0.6rem; color: var(--ink-2); text-align: center; }
+  .series video { width: 100%; max-width: 44rem; display: block;
+    margin-inline: auto; background: #1a1410; border-radius: 4px; }
+  .series audio, .complete { width: 100%; max-width: 30rem; display: block;
+    margin-inline: auto; }
+  /* Playback speed. The browsers that offer this at all bury it in a
+     context menu, and some offer nothing, so the page carries its own. */
+  .speed {
+    display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center;
+    justify-content: center; margin: 0.35rem 0 0;
+    font-family: var(--sans); font-size: 0.62rem;
+  }
+  .speed span {
+    color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.06em;
+    margin-right: 0.1rem; opacity: 0.75;
+  }
+  .speed button {
+    font: inherit; color: var(--ink-3); background: transparent;
+    border: 1px solid transparent; border-radius: 999px;
+    padding: 0.08rem 0.36rem; cursor: pointer; line-height: 1.45;
+  }
+  .speed button:hover { color: var(--ink-2); border-color: var(--rule); }
+  .speed button.on { color: var(--ink-2); border-color: var(--ink-3); }
+  /* Captions sit at the end of the same row, with a gap so they read as a
+     separate control rather than the fastest speed. */
+  .speed button.cc { margin-left: 0.5rem; letter-spacing: 0.04em; }
+  /* The running time, last in the row, so somebody knows what they are
+     starting before they start it. Not a control, so it is not a button and
+     it does not take the uppercase label treatment the word Speed gets. */
+  .speed .len {
+    margin-left: 0.6rem; margin-right: 0; text-transform: none;
+    letter-spacing: 0; font-variant-numeric: tabular-nums;
+  }
+</style>
+<!-- Google Analytics 4, on every page of the site.
+
+     Injected into the <head> of every built page by add_analytics() in
+     build_site.py, rather than pasted into the three hand-written pages and
+     the pandoc header. The version folders are finished HTML that is copied
+     across untouched, so a component the page has to include would miss
+     them; a pass over the finished site/ is the only place that reaches all
+     of them. G-PNWLMJLE50 is the measurement ID, filled in from GA_ID.
+
+     What GA4 counts by itself, once Enhanced measurement is on in the
+     property: page views, outbound clicks, file downloads, site search and
+     one scroll event at ninety per cent. None of that is repeated here. Its
+     video tracking only understands embedded YouTube, and the films on this
+     site are plain <video> elements served from the site itself, so the
+     watching is counted below. -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-PNWLMJLE50"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-PNWLMJLE50');
+</script>
+<script>
+(function () {
+  if (typeof gtag !== 'function') return;
+
+  /* What a report needs to name the thing that was watched or read. The
+     file name rather than the path, because the same film is reachable at
+     more than one URL and a report that splits it across them is no use. */
+  function assetName(el) {
+    var src = el.currentSrc || el.src || '';
+    if (!src) {
+      var s = el.querySelector && el.querySelector('source');
+      src = s ? s.getAttribute('src') : '';
+    }
+    return (src.split('/').pop() || 'unknown').replace(/\?.*$/, '');
+  }
+
+  function send(name, params) {
+    params = params || {};
+    params.page_path = location.pathname;
+    gtag('event', name, params);
+  }
+
+  /* The films and the audio. A play is easy to get and says little on its
+     own, since somebody who starts a film and leaves counts the same as
+     somebody who watches it through. So each player also reports the
+     quarters it passes, once each, and reaching the end. */
+  var MARKS = [25, 50, 75];
+  document.querySelectorAll('video, audio').forEach(function (m) {
+    var kind = m.tagName.toLowerCase();
+    var seen = {};
+
+    m.addEventListener('play', function () {
+      send('media_play', {asset: assetName(m), media_type: kind});
+    });
+
+    m.addEventListener('timeupdate', function () {
+      if (!m.duration || !isFinite(m.duration)) return;
+      var pct = (m.currentTime / m.duration) * 100;
+      MARKS.forEach(function (mark) {
+        if (pct >= mark && !seen[mark]) {
+          seen[mark] = true;
+          send('media_progress', {
+            asset: assetName(m), media_type: kind, percent: mark});
+        }
+      });
+    });
+
+    m.addEventListener('ended', function () {
+      send('media_complete', {asset: assetName(m), media_type: kind});
+    });
+  });
+
+  /* How far down a page anybody got. GA4's own scroll event fires once, at
+     ninety per cent, which cannot tell a page nobody finished from one
+     nobody started. Reported under its own name so the two do not mix. */
+  var depths = [25, 50, 75, 100], reached = {};
+  function scrolled() {
+    var doc = document.documentElement;
+    var height = doc.scrollHeight - window.innerHeight;
+    if (height <= 0) return;
+    var pct = ((window.scrollY || doc.scrollTop) / height) * 100;
+    depths.forEach(function (d) {
+      if (pct >= d && !reached[d]) {
+        reached[d] = true;
+        send('scroll_depth', {percent: d});
+      }
+    });
+  }
+  window.addEventListener('scroll', scrolled, {passive: true});
+  scrolled();
+
+  /* The controls the site draws itself: the full-screen button on every
+     page, and the speed and caption buttons under each film. Nothing
+     outside the site knows these were pressed. */
+  document.addEventListener('fullscreenchange', function () {
+    send(document.fullscreenElement ? 'fullscreen_enter' : 'fullscreen_exit');
+  });
+
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('.speed button');
+    if (!b) return;
+    if (b.classList.contains('cc')) send('captions_toggle');
+    else send('playback_speed', {speed: (b.textContent || '').trim()});
+  });
+})();
+</script>
+</head>
+<body>
+<!-- The bar across the top of the three hand-written pages at the root: the
+     landing page, the labs page and the watch page. A component of its own,
+     included by each of them, because it was pasted into all three and the
+     copies drifted.
+
+     The version pages have their own bar, built in build_site.py, because
+     it is a different bar: it carries the version's name under the mark and
+     its tabs are that version's own pages. -->
+<nav class="nav">
+  <a class="brand" href="index.html">
+    <img src="marsworm.svg" alt="">
+    <span class="wordmark"><b>MarsWorm</b></span>
+  </a>
+  <button class="menu" type="button" aria-label="Menu"
+          aria-expanded="false" aria-controls="nav-links">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="links" id="nav-links">
+    <details class="vers"><summary>Versions</summary><div class="panel"><a href="v5-a-plant-on-open-mars/index.html">V5. A plant on open Mars</a>
+      <a href="v4-the-bioengineered-plant/index.html">V4. The bioengineered plant</a>
+      <a href="v3-earth-microbes-no-plumbing/index.html">V3. Earth microbes, no plumbing</a>
+      <a href="v2-earth-microbes-at-work/index.html">V2. Earth microbes at work</a>
+      <a href="v1-bioengineered-organism/index.html">V1. The bioengineered organism</a></div></details>
+    <a href="labs.html">Labs</a>
+    <a href="watch.html" class="here">Watch</a>
+  </div>
+</nav>
+
+<main class="page">
+
+<h1>Watch</h1>
+
+<p>Six short films, two hosts, three to five minutes each. The first is
+the whole story. The other five take one version each.</p>
+
+<p>They keep it simple on purpose. If one leaves you wanting the details,
+they are all here waiting on the rest of the site.</p>
+
+<ol class="series">
+<li>
+<h3><span class="tag">The overview</span> One question, five answers</h3>
+<p>The whole project in one go. Five answers to the same question, each one changed by testing the one before it.</p>
+<video controls preload="none" playsinline poster="watch/1-one-question-five-answers.jpg"
+       controlsList="nodownload noremoteplayback" disableremoteplayback data-length="5:33">
+  <source src="watch/1-one-question-five-answers.mp4" type="video/mp4">
+  <track kind="captions" src="watch/1-one-question-five-answers.vtt" srclang="en" label="English">
+  <a href="watch/1-one-question-five-answers.mp4">Download episode 1 (MP4)</a>
+</video>
+</li>
+<li>
+<h3><span class="tag">V1.</span> The bioengineered organism</h3>
+<p>Every sequenced organism on Earth was scored, and none could do the job and survive Mars. So the abilities were borrowed one at a time.</p>
+<video controls preload="none" playsinline poster="watch/2-the-bioengineered-organism.jpg"
+       controlsList="nodownload noremoteplayback" disableremoteplayback data-length="2:59">
+  <source src="watch/2-the-bioengineered-organism.mp4" type="video/mp4">
+  <track kind="captions" src="watch/2-the-bioengineered-organism.vtt" srclang="en" label="English">
+  <a href="watch/2-the-bioengineered-organism.mp4">Download episode 2 (MP4)</a>
+</video>
+</li>
+<li>
+<h3><span class="tag">V2.</span> Earth microbes at work</h3>
+<p>Before building anything, the design was tested in a computer and fed only what Mars has. It starved. A better idea came out of that.</p>
+<video controls preload="none" playsinline poster="watch/3-earth-microbes-at-work.jpg"
+       controlsList="nodownload noremoteplayback" disableremoteplayback data-length="3:45">
+  <source src="watch/3-earth-microbes-at-work.mp4" type="video/mp4">
+  <track kind="captions" src="watch/3-earth-microbes-at-work.vtt" srclang="en" label="English">
+  <a href="watch/3-earth-microbes-at-work.mp4">Download episode 3 (MP4)</a>
+</video>
+</li>
+<li>
+<h3><span class="tag">V3.</span> Earth microbes, no plumbing</h3>
+<p>All that equipment has to be flown to Mars and mended with no spares. So could the microbes do the whole job in the dirt itself?</p>
+<video controls preload="none" playsinline poster="watch/4-earth-microbes-no-plumbing.jpg"
+       controlsList="nodownload noremoteplayback" disableremoteplayback data-length="3:57">
+  <source src="watch/4-earth-microbes-no-plumbing.mp4" type="video/mp4">
+  <track kind="captions" src="watch/4-earth-microbes-no-plumbing.vtt" srclang="en" label="English">
+  <a href="watch/4-earth-microbes-no-plumbing.mp4">Download episode 4 (MP4)</a>
+</video>
+</li>
+<li>
+<h3><span class="tag">V4.</span> The bioengineered plant</h3>
+<p>Six ways to farm outside the dome, and why each one failed. Then a much simpler idea: leave Mars alone and change the plant.</p>
+<video controls preload="none" playsinline poster="watch/5-the-bioengineered-plant.jpg"
+       controlsList="nodownload noremoteplayback" disableremoteplayback data-length="3:59">
+  <source src="watch/5-the-bioengineered-plant.mp4" type="video/mp4">
+  <track kind="captions" src="watch/5-the-bioengineered-plant.vtt" srclang="en" label="English">
+  <a href="watch/5-the-bioengineered-plant.mp4">Download episode 5 (MP4)</a>
+</video>
+</li>
+<li>
+<h3><span class="tag">V5.</span> A plant on open Mars</h3>
+<p>Take that plant outside and the air is so thin a warm leaf boils. So the plant only works if it stays frozen. Is that worth chasing?</p>
+<video controls preload="none" playsinline poster="watch/6-a-plant-on-open-mars.jpg"
+       controlsList="nodownload noremoteplayback" disableremoteplayback data-length="3:30">
+  <source src="watch/6-a-plant-on-open-mars.mp4" type="video/mp4">
+  <track kind="captions" src="watch/6-a-plant-on-open-mars.vtt" srclang="en" label="English">
+  <a href="watch/6-a-plant-on-open-mars.mp4">Download episode 6 (MP4)</a>
+</video>
+</li>
+</ol>
+
+</main>
+
+<footer class="foot">
+  <p class="line">MarsWorm &nbsp;·&nbsp; Making Arid Regolith into Soil, With
+    Organisms Redesigned for Mars</p>
+  <p class="who"><b>Saanvi Pagadala</b> · Granite Bay, CA</p>
+</footer>
+
+<!-- Playback speed and captions, as buttons under each player.
+
+     A browser that offers speed at all hides it in a context menu, and
+     several offer nothing, which is no use to someone who watches at one
+     and a half. Captions are the same story: the button a browser draws on
+     the player is easy to miss, is drawn differently everywhere, and with
+     preload="none" may not appear until the film has started. So the page
+     carries its own, beside the speed.
+
+     Both apply to every player on the page and are remembered, so moving to
+     the next film keeps them. A browser resets playbackRate when it loads a
+     source and a track is not ready the moment the page is, so both are set
+     again once a video knows what it has. -->
+<script>
+(function () {
+  var SPEEDS = [1, 1.25, 1.5, 1.75, 2];
+  var rate = 1;
+  try { rate = parseFloat(localStorage.getItem('mw-rate')) || 1; } catch (e) {}
+
+  var showing = false;
+  try { showing = localStorage.getItem('mw-cc') === 'on'; } catch (e) {}
+
+  function captions(on) {
+    showing = on;
+    try { localStorage.setItem('mw-cc', on ? 'on' : 'off'); } catch (e) {}
+    document.querySelectorAll('video').forEach(function (v) {
+      for (var i = 0; i < v.textTracks.length; i++) {
+        v.textTracks[i].mode = on ? 'showing' : 'hidden';
+      }
+    });
+    document.querySelectorAll('.speed button.cc').forEach(function (b) {
+      b.classList.toggle('on', on);
+      b.setAttribute('aria-pressed', on);
+    });
+  }
+
+  function apply() {
+    document.querySelectorAll('audio, video').forEach(function (a) {
+      a.playbackRate = rate;
+    });
+    document.querySelectorAll('.speed button').forEach(function (b) {
+      b.classList.toggle('on', parseFloat(b.dataset.rate) === rate);
+      b.setAttribute('aria-pressed', parseFloat(b.dataset.rate) === rate);
+    });
+  }
+
+  document.querySelectorAll('audio, video').forEach(function (audio) {
+    var row = document.createElement('div');
+    row.className = 'speed';
+    row.innerHTML = '<span>Speed</span>';
+    SPEEDS.forEach(function (s) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.dataset.rate = s;
+      b.textContent = (s === 1 ? '1' : String(s)) + '\u00d7';
+      b.addEventListener('click', function () {
+        rate = s;
+        try { localStorage.setItem('mw-rate', s); } catch (e) {}
+        apply();
+      });
+      row.appendChild(b);
+    });
+    if (audio.textTracks && audio.textTracks.length) {
+      var cc = document.createElement('button');
+      cc.type = 'button';
+      cc.className = 'cc';
+      cc.textContent = 'CC';
+      cc.title = 'Captions';
+      cc.addEventListener('click', function () {
+        captions(!showing);
+      });
+      row.appendChild(cc);
+    }
+    /* The running time, measured from the file at build time and carried
+       on the player, because preload="none" means the browser has not
+       fetched enough to know it until somebody presses play. */
+    if (audio.dataset.length) {
+      var len = document.createElement('span');
+      len.className = 'len';
+      len.textContent = audio.dataset.length;
+      row.appendChild(len);
+    }
+
+    audio.insertAdjacentElement('afterend', row);
+    audio.addEventListener('play', function () { audio.playbackRate = rate; });
+    audio.addEventListener('loadedmetadata', function () {
+      audio.playbackRate = rate;
+    });
+  });
+
+  apply();
+  captions(showing);
+  // A track is not ready the moment the page is, and preload="none" means
+  // it is not fetched until somebody presses play. Set it again once the
+  // video knows what it has, or the choice is lost on first play.
+  document.querySelectorAll('video').forEach(function (v) {
+    v.addEventListener('loadedmetadata', function () { captions(showing); });
+  });
+})();
+</script>
+
+<!-- One player at a time. Starting an episode pauses whichever one was
+     already going, so the page never talks over itself, whether it is a
+     video or the audio of another episode. The listener sits on the
+     document and uses capture, because a play event does not bubble;
+     that also means it keeps working for players swapped in later. -->
+<script>
+document.addEventListener('play', function (e) {
+  document.querySelectorAll('audio, video').forEach(function (other) {
+    if (other !== e.target) other.pause();
+  });
+}, true);
+</script>
+
+<!-- The tab menu button, on small screens. A component of its own: the build
+     appends it to every page it makes, and the three hand-written pages at the
+     root include it too, so the nav behaves the same everywhere. Do not paste
+     this into a page by hand; include it. -->
+<!-- The menu button, on small screens. Every listener is on the document
+     rather than on the button, because the markup around it can be replaced
+     the whole nav when it swaps a page in, and a listener bound to the old
+     button would go with it. -->
+<script>
+(function () {
+  function nav() { return document.querySelector('.nav'); }
+
+  function set(open) {
+    var n = nav();
+    if (!n) return;
+    n.classList.toggle('open', open);
+    var b = n.querySelector('.menu');
+    if (b) b.setAttribute('aria-expanded', open ? 'true' : 'false');
+    // The versions live in a <details>, and a closed one hides its panel in
+    // a way no stylesheet can reach. In the drawer there is a column to
+    // spare and nothing to gain from a second thing to open, so it opens
+    // with the drawer and the summary is hidden by the stylesheet.
+    var v = n.querySelector('.vers');
+    if (v) v.open = open;
+  }
+
+  // Capture, not bubble. A bubbling listener on the document never hears
+  // some taps on iOS; the capture phase runs from the window down to the
+  // target and always does.
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    var v = document.querySelector('.nav .vers[open]');
+    if (v) { v.open = false; v.querySelector('summary').focus(); }
+    set(false);
+  });
+
+  document.addEventListener('click', function (e) {
+    var t = e.target;
+    if (!t || !t.closest) return;
+    if (t.closest('.menu')) { set(!nav().classList.contains('open')); return; }
+    // On a wide screen the versions panel is a dropdown, and a dropdown
+    // that will not close when you look away is an annoyance. Anything
+    // outside it shuts it, and so does Escape.
+    var v = document.querySelector('.nav .vers[open]');
+    if (v && !t.closest('.vers')) v.open = false;
+    // A tab was chosen, or the reader tapped the page behind the panel.
+    // Either way the menu has done its job.
+    set(false);
+  }, true);
+
+  addEventListener('keydown', function (e) { if (e.key === 'Escape') set(false); });
+  // Turning the phone sideways can put the tabs back in the bar, and an open
+  // panel would then be a second copy of them.
+  addEventListener('resize', function () { set(false); });
+})();
+</script>
+
+
+<!-- The fullscreen button and the router that keeps fullscreen across links.
+     A component of its own: the build appends it to every page it makes, and
+     the landing page includes it too, so every page on the site offers the
+     same button. Do not paste this into a page by hand; include it. -->
+
+<!-- Fullscreen, the way a video player offers it: a quiet corner button that
+     gets the browser's own furniture out of the way for reading. Written by
+     script rather than sitting in the markup, because a browser that cannot
+     do it should not be offered it. Desktop only: an iPhone has no fullscreen
+     for a page, and on a tablet the button would sit under a thumb. -->
+<script>
+(function () {
+  var root = document.documentElement;
+  if (!(root.requestFullscreen || root.webkitRequestFullscreen)) return;
+  if ('ontouchstart' in window) return;
+
+  var EXPAND = '<path d="M3 8V3h5M17 3h5v5M22 17v5h-5M8 22H3v-5"/>';
+  var SHRINK = '<path d="M8 3v5H3M22 8h-5V3M17 22v-5h5M3 17h5v5"/>';
+
+  var btn = document.createElement('button');
+  btn.className = 'fs';
+  btn.type = 'button';
+  document.body.appendChild(btn);
+
+  function on() {
+    return !!(document.fullscreenElement || document.webkitFullscreenElement);
+  }
+  function paint() {
+    var label = on() ? 'Leave fullscreen' : 'Read fullscreen';
+    btn.setAttribute('aria-label', label);
+    btn.title = label + '  (F)';
+    btn.innerHTML = '<svg viewBox="0 0 25 25" aria-hidden="true">' +
+                    (on() ? SHRINK : EXPAND) + '</svg>';
+  }
+  function toggle() {
+    if (on()) {
+      (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    } else {
+      (root.requestFullscreen || root.webkitRequestFullscreen).call(root);
+    }
+  }
+
+  btn.addEventListener('click', toggle);
+  document.addEventListener('fullscreenchange', paint);
+  document.addEventListener('webkitfullscreenchange', paint);
+  // The same shortcut a video player uses, but never while something is being
+  // typed into, and never on top of a browser shortcut.
+  addEventListener('keydown', function (e) {
+    if (e.key !== 'f' && e.key !== 'F') return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    var t = e.target;
+    if (t && (t.isContentEditable ||
+              /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+    e.preventDefault();
+    toggle();
+  });
+  paint();
+})();
+</script>
+
+<!-- Fullscreen belongs to a document, so following an ordinary link drops out
+     of it, and the new page cannot ask to go back in: a browser only grants
+     fullscreen on a click, and a fresh document has no click behind it.
+
+     So while fullscreen is on, and only then, a click on a link to another
+     page of this site fetches that page and swaps it in rather than
+     navigating. The document never changes, so fullscreen never ends. Outside
+     fullscreen nothing here runs at all and every link is an ordinary link,
+     which is what keeps this plain static HTML for anyone reading it normally,
+     and what makes the failure of any of it harmless. -->
+<script>
+(function () {
+  var PARTS = ['.nav', '.page', '.foot'];
+
+  function full() {
+    return !!(document.fullscreenElement || document.webkitFullscreenElement);
+  }
+
+  function settle(hash) {
+    // The nav's height and the landing on a #section are both worked out on
+    // load; a swapped-in page has to have them worked out again.
+    var nav = document.querySelector('.nav');
+    if (nav) {
+      document.documentElement.style.setProperty(
+        '--nav-h', nav.getBoundingClientRect().height + 'px');
+    }
+    var el = hash && document.getElementById(decodeURIComponent(hash.slice(1)));
+    // Nothing animates: the stylesheet asks for no smooth scrolling, so these
+    // arrive at once rather than gliding and being interrupted.
+    if (el) el.scrollIntoView(true);
+    else scrollTo(0, 0);
+  }
+
+  function swap(url, push) {
+    fetch(url.href).then(function (r) {
+      if (!r.ok) throw 0;
+      return r.text();
+    }).then(function (text) {
+      var doc = new DOMParser().parseFromString(text, 'text/html');
+      var next = PARTS.map(function (sel) { return doc.querySelector(sel); });
+      if (next.some(function (n) { return !n; })) throw 0;
+      // The URL is changed first: every relative href and src in the incoming
+      // markup is resolved against it, and the pages sit at different depths.
+      if (push) history.pushState({}, '', url.href);
+      PARTS.forEach(function (sel, i) {
+        document.querySelector(sel).replaceWith(next[i]);
+      });
+      document.title = doc.title;
+      if (window.wireFolds) wireFolds();
+      settle(url.hash);
+    }).catch(function () {
+      location.href = url.href;              // give up quietly, navigate
+    });
+  }
+
+  addEventListener('click', function (e) {
+    if (!full() || e.defaultPrevented) return;
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button) return;
+    var a = e.target.closest && e.target.closest('a');
+    if (!a || a.target || a.hasAttribute('download')) return;
+    var url = new URL(a.href, location.href);
+    if (url.origin !== location.origin) return;
+    // Only pages. A .csv or an image is a download or a viewer, and neither
+    // is something to paste into this one.
+    if (!/\.html$/.test(url.pathname)) return;
+    if (url.pathname === location.pathname) return;   // an anchor on this page
+    e.preventDefault();
+    swap(url, true);
+  });
+
+  addEventListener('popstate', function () {
+    if (full()) swap(new URL(location.href), false);
+  });
+})();
+</script>
+
+<script>
+// Foldable groups inside a long table. The heading rows are made by
+// span_category_rows() in the build; everything between one of them and the
+// next (or the totals row) belongs to that group.
+(function () {
+  function body(row) {
+    var out = [], r = row.nextElementSibling;
+    while (r && !r.querySelector('td.catrow') && !r.querySelector('.tot')) {
+      out.push(r); r = r.nextElementSibling;
+    }
+    return out;
+  }
+  window.wireFolds = function () {
+  document.querySelectorAll('td.catrow').forEach(function (cell) {
+    if (cell.dataset.folds) return;            // already wired
+    cell.dataset.folds = '1';
+    var row = cell.parentNode, open = true;
+    cell.setAttribute('role', 'button');
+    cell.setAttribute('tabindex', '0');
+    function toggle() {
+      open = !open;
+      row.classList.toggle('closed', !open);
+      body(row).forEach(function (r) { r.hidden = !open; });
+    }
+    toggle();                                  // start folded
+    cell.addEventListener('click', toggle);
+    cell.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+    });
+  });
+  };
+  wireFolds();
+})();
+</script>
+
+</body>
+</html>

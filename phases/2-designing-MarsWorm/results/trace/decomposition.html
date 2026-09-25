@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MarsWorm</title>
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://saanvipagadala.github.io/MarsWorm/v1-bioengineered-organism/phases/2-designing-MarsWorm/results/trace/decomposition.html">
+<meta http-equiv="refresh" content="0; url=https://saanvipagadala.github.io/MarsWorm/v1-bioengineered-organism/phases/2-designing-MarsWorm/results/trace/decomposition.html">
+<script>location.replace('https://saanvipagadala.github.io/MarsWorm/v1-bioengineered-organism/phases/2-designing-MarsWorm/results/trace/decomposition.html' + location.hash);</script>
+<!-- Google Analytics 4, on every page of the site.
+
+     Injected into the <head> of every built page by add_analytics() in
+     build_site.py, rather than pasted into the three hand-written pages and
+     the pandoc header. The version folders are finished HTML that is copied
+     across untouched, so a component the page has to include would miss
+     them; a pass over the finished site/ is the only place that reaches all
+     of them. G-PNWLMJLE50 is the measurement ID, filled in from GA_ID.
+
+     What GA4 counts by itself, once Enhanced measurement is on in the
+     property: page views, outbound clicks, file downloads, site search and
+     one scroll event at ninety per cent. None of that is repeated here. Its
+     video tracking only understands embedded YouTube, and the films on this
+     site are plain <video> elements served from the site itself, so the
+     watching is counted below. -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-PNWLMJLE50"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-PNWLMJLE50');
+</script>
+<script>
+(function () {
+  if (typeof gtag !== 'function') return;
+
+  /* What a report needs to name the thing that was watched or read. The
+     file name rather than the path, because the same film is reachable at
+     more than one URL and a report that splits it across them is no use. */
+  function assetName(el) {
+    var src = el.currentSrc || el.src || '';
+    if (!src) {
+      var s = el.querySelector && el.querySelector('source');
+      src = s ? s.getAttribute('src') : '';
+    }
+    return (src.split('/').pop() || 'unknown').replace(/\?.*$/, '');
+  }
+
+  function send(name, params) {
+    params = params || {};
+    params.page_path = location.pathname;
+    gtag('event', name, params);
+  }
+
+  /* The films and the audio. A play is easy to get and says little on its
+     own, since somebody who starts a film and leaves counts the same as
+     somebody who watches it through. So each player also reports the
+     quarters it passes, once each, and reaching the end. */
+  var MARKS = [25, 50, 75];
+  document.querySelectorAll('video, audio').forEach(function (m) {
+    var kind = m.tagName.toLowerCase();
+    var seen = {};
+
+    m.addEventListener('play', function () {
+      send('media_play', {asset: assetName(m), media_type: kind});
+    });
+
+    m.addEventListener('timeupdate', function () {
+      if (!m.duration || !isFinite(m.duration)) return;
+      var pct = (m.currentTime / m.duration) * 100;
+      MARKS.forEach(function (mark) {
+        if (pct >= mark && !seen[mark]) {
+          seen[mark] = true;
+          send('media_progress', {
+            asset: assetName(m), media_type: kind, percent: mark});
+        }
+      });
+    });
+
+    m.addEventListener('ended', function () {
+      send('media_complete', {asset: assetName(m), media_type: kind});
+    });
+  });
+
+  /* How far down a page anybody got. GA4's own scroll event fires once, at
+     ninety per cent, which cannot tell a page nobody finished from one
+     nobody started. Reported under its own name so the two do not mix. */
+  var depths = [25, 50, 75, 100], reached = {};
+  function scrolled() {
+    var doc = document.documentElement;
+    var height = doc.scrollHeight - window.innerHeight;
+    if (height <= 0) return;
+    var pct = ((window.scrollY || doc.scrollTop) / height) * 100;
+    depths.forEach(function (d) {
+      if (pct >= d && !reached[d]) {
+        reached[d] = true;
+        send('scroll_depth', {percent: d});
+      }
+    });
+  }
+  window.addEventListener('scroll', scrolled, {passive: true});
+  scrolled();
+
+  /* The controls the site draws itself: the full-screen button on every
+     page, and the speed and caption buttons under each film. Nothing
+     outside the site knows these were pressed. */
+  document.addEventListener('fullscreenchange', function () {
+    send(document.fullscreenElement ? 'fullscreen_enter' : 'fullscreen_exit');
+  });
+
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('.speed button');
+    if (!b) return;
+    if (b.classList.contains('cc')) send('captions_toggle');
+    else send('playback_speed', {speed: (b.textContent || '').trim()});
+  });
+})();
+</script>
+</head>
+<body>
+<p>This page has moved to <a href="https://saanvipagadala.github.io/MarsWorm/v1-bioengineered-organism/phases/2-designing-MarsWorm/results/trace/decomposition.html">https://saanvipagadala.github.io/MarsWorm/v1-bioengineered-organism/phases/2-designing-MarsWorm/results/trace/decomposition.html</a>.</p>
+</body>
+</html>
