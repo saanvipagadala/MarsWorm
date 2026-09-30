@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dry run: Experiment 2: how much perchlorate can an earthworm stand?</title>
+<style>
+  /* Light is the base. Every colour is a token so both themes stay a set. */
+  :root{
+    --bg:#FBFAF7; --surface:#FFFFFF; --sunken:#F4F1EA;
+    --ink:#1B1A17; --ink-2:#4A4740; --ink-3:#7C776C;
+    --rule:#E2DDD1; --rule-2:#CFC8B8;
+    --g1:#E5DBCA; --g2:#F3D6A2; --g3:#A9D9C0; --g4:#BBD6EE; --g5:#CAC4EC;
+    --e1:#A8977A; --e2:#C98A1E; --e3:#218A61; --e4:#4E85B8; --e5:#6F63C4;
+    --good:#1C6B4A; --warn:#B5651D; --bad:#A33A2A; --flat:#7C776C;
+    --shadow:0 1px 2px rgba(27,26,23,.06),0 4px 14px rgba(27,26,23,.05);
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#14161A; --surface:#1B1E24; --sunken:#22262E;
+      --ink:#F2EFE8; --ink-2:#BFBAAF; --ink-3:#8B867B;
+      --rule:#2E333C; --rule-2:#3D434E;
+      --g1:#6E6555; --g2:#8C6C36; --g3:#3B6E58; --g4:#455F7C; --g5:#585177;
+      --e1:#B3A489; --e2:#E0A448; --e3:#5FBE94; --e4:#7FADD9; --e5:#9A8FE0;
+      --good:#3E9E71; --warn:#E9A23C; --bad:#E0705C; --flat:#8B867B;
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 16px rgba(0,0,0,.3);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#14161A; --surface:#1B1E24; --sunken:#22262E;
+    --ink:#F2EFE8; --ink-2:#BFBAAF; --ink-3:#8B867B;
+    --rule:#2E333C; --rule-2:#3D434E;
+    --g1:#6E6555; --g2:#8C6C36; --g3:#3B6E58; --g4:#455F7C; --g5:#585177;
+    --e1:#B3A489; --e2:#E0A448; --e3:#5FBE94; --e4:#7FADD9; --e5:#9A8FE0;
+    --good:#3E9E71; --warn:#E9A23C; --bad:#E0705C; --flat:#8B867B;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 16px rgba(0,0,0,.3);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font:16px/1.6 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* The page fills the screen and so does the text. Nothing is capped to a
+     column width -- a sentence runs the width of the window and wraps only
+     when it actually reaches the edge. */
+  .wrap{width:100%;margin:0;padding:36px clamp(20px,4vw,64px) 88px}
+  header{border-bottom:2px solid var(--ink);padding-bottom:20px;margin-bottom:8px}
+  .eyebrow{
+    font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ink-3);font-weight:650;margin:0 0 8px
+  }
+  h1{font-size:clamp(30px,4vw,50px);line-height:1.1;margin:0 0 12px;
+     letter-spacing:-.02em}
+  .sub{color:var(--ink-2);margin:0;font-size:17.5px}
+  .stamp{color:var(--ink-3);font-size:13px;margin-top:14px}
+  h2{font-size:25px;margin:52px 0 6px;letter-spacing:-.01em}
+  h2 + .lede{color:var(--ink-2);margin:0 0 20px}
+  h3{font-size:17px;margin:26px 0 8px}
+  p{margin:0 0 12px}
+  a{color:inherit;text-underline-offset:2px}
+  /* ---- verdict cards ---------------------------------------------- */
+  .cards{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));margin:18px 0 0}
+  .card{
+    background:var(--surface);border:1px solid var(--rule);border-radius:12px;
+    padding:18px 20px;box-shadow:var(--shadow);border-top:4px solid var(--flat)
+  }
+  .card.yes{border-top-color:var(--good)} .card.no{border-top-color:var(--bad)}
+  .card.partial{border-top-color:var(--warn)}
+  .card.na{border-top-color:var(--rule-2)}
+  .card.na .call{color:var(--ink-3)}
+  .card h3{margin:0 0 4px;font-size:15px;color:var(--ink-3);
+           letter-spacing:.06em;text-transform:uppercase}
+  .card .call{font-size:20px;font-weight:680;margin:2px 0 8px;letter-spacing:-.01em}
+  .card.yes .call{color:var(--good)} .card.no .call{color:var(--bad)}
+  .card.partial .call{color:var(--warn)}
+  .card p{margin:0;font-size:14.5px;color:var(--ink-2)}
+  .card p b{color:var(--ink)}
+  /* the dust -> soil ruler, with this run's mark on it */
+  .ruler{margin:2px 0 12px}
+  .ruler .track{position:relative;height:9px;border-radius:99px;
+                background:var(--g1);border:1px solid var(--rule-2)}
+  .ruler .fill{position:absolute;inset:0 auto 0 0;border-radius:99px;
+               background:var(--g3)}
+  .ruler .pin{position:absolute;top:50%;width:3px;height:19px;border-radius:2px;
+              background:var(--ink);transform:translate(-50%,-50%)}
+  .ruler .ends{display:flex;justify-content:space-between;margin-top:7px;
+               font-size:11.5px;line-height:1.35;color:var(--ink-3)}
+  .ruler .ends span:last-child{text-align:right}
+  /* ---- figures ----------------------------------------------------- */
+  figure{margin:22px 0 0;background:var(--surface);border:1px solid var(--rule);
+         border-radius:12px;padding:20px 20px 14px;box-shadow:var(--shadow)}
+  figure .cap{font-size:14px;color:var(--ink-2);margin:12px 0 0}
+  figure .what{font-size:13.5px;color:var(--ink-3);margin:0 0 10px}
+  .chart-scroll{overflow-x:auto}
+  svg{display:block;max-width:100%;height:auto}
+  .legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin:0 0 14px;
+          font-size:13.5px;color:var(--ink-2)}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+  .swatch{width:13px;height:13px;border-radius:4px;border:2px solid var(--rule-2);
+          display:inline-block;flex:none}
+  .grid2{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(440px,1fr))}
+  /* ---- tables ------------------------------------------------------ */
+  .tw{overflow-x:auto;margin:16px 0 0;border:1px solid var(--rule);
+      border-radius:12px;background:var(--surface);box-shadow:var(--shadow)}
+  .tw + .cap{margin:16px 0 0;font-size:14px;color:var(--ink-2)}
+  .tw:last-child{margin-bottom:8px}
+  table{border-collapse:collapse;width:100%;font-size:14.5px}
+  th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--rule)}
+  thead th{background:var(--sunken);font-size:12px;letter-spacing:.07em;
+           text-transform:uppercase;color:var(--ink-3);white-space:nowrap}
+  tbody tr:last-child td{border-bottom:none}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+  .tag{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;
+       font-weight:640;letter-spacing:.02em;white-space:nowrap}
+  .tag.yes{background:color-mix(in srgb,var(--good) 16%,transparent);color:var(--good)}
+  .tag.no{background:color-mix(in srgb,var(--bad) 16%,transparent);color:var(--bad)}
+  .tag.partial{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
+  .tag.flat,.tag.na{background:var(--sunken);color:var(--ink-3)}
+  .dot{width:9px;height:9px;border-radius:3px;display:inline-block;margin-right:7px;
+       border:2px solid var(--rule-2);vertical-align:-1px}
+  /* ---- the full-data grid ------------------------------------------
+     Nine columns will not fit any screen, so: the headers wrap instead of
+     forcing the columns wide, the numbers get tight columns, and the group
+     name stays pinned to the left while the rest scrolls under it. */
+  table.grid{font-size:13.5px}
+  table.grid th,table.grid td{padding:8px 10px}
+  table.grid thead th{white-space:normal;vertical-align:bottom;
+                      max-width:104px;line-height:1.3}
+  table.grid tbody td{white-space:nowrap}
+  table.grid th:first-child,table.grid td:first-child{
+    position:sticky;left:0;z-index:2;white-space:nowrap;
+    box-shadow:1px 0 0 var(--rule-2)}
+  table.grid thead th:first-child{background:var(--sunken);z-index:3}
+  table.grid tbody td:first-child{background:var(--surface)}
+  table.grid tbody td:first-child.best{
+    background:color-mix(in srgb,var(--g3) 42%,var(--surface))}
+  table.grid tr.ref td:first-child{background:var(--sunken)}
+  table.grid td.best{background:color-mix(in srgb,var(--g3) 42%,transparent);
+                     font-weight:680;color:var(--ink)}
+  /* rounded ends, so the band reads as one stripe */
+  table.grid tbody td:first-child.best{border-radius:7px 0 0 7px}
+  table.grid tbody td.best:last-child{border-radius:0 7px 7px 0}
+  table.grid tr.ref td{color:var(--ink-3)}
+  table.grid tr.ref{background:var(--sunken)}
+  /* ---- notes ------------------------------------------------------- */
+  .note{background:var(--sunken);border-left:3px solid var(--rule-2);
+        border-radius:0 8px 8px 0;padding:16px 20px;margin:18px 0 0;
+        font-size:15px;color:var(--ink-2)}
+  .note p:last-child{margin-bottom:0}
+  .note b{color:var(--ink)}
+  .note.warn{border-left-color:var(--warn)}
+  code{font:13.5px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;
+       background:var(--sunken);padding:1px 6px;border-radius:5px}
+  /* the page just stopped before; this says it meant to */
+  .end{display:flex;align-items:center;gap:16px;margin:64px 0 0;
+       color:var(--ink-3)}
+  .end::before,.end::after{content:"";flex:1;height:1px;background:var(--rule)}
+  .end span{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;
+            font-weight:600;white-space:nowrap}
+  @media (prefers-reduced-motion:no-preference){
+    .card,figure{transition:box-shadow .18s ease}
+  }
+  /* ---- the two chrome buttons -------------------------------------- */
+  .chip{
+    display:inline-flex;align-items:center;gap:8px;cursor:pointer;
+    background:var(--surface);color:var(--ink-2);
+    border:1px solid var(--rule-2);border-radius:99px;
+    padding:9px 14px;font:inherit;font-size:13.5px;font-weight:600;
+    box-shadow:var(--shadow);line-height:1;
+  }
+  .chip:hover{color:var(--ink);border-color:var(--ink-3)}
+  .chip:focus-visible{outline:2px solid var(--ink-3);outline-offset:2px}
+  .chip svg{width:16px;height:16px;fill:currentColor;flex:none}
+  #themeBtn{position:fixed;top:18px;right:18px;z-index:40;padding:10px}
+  #fullscreenBtn{position:fixed;bottom:18px;right:18px;z-index:40}
+  #fullscreenBtn[data-fullscreen] .fs-label{display:none}
+  @media print{.chip{display:none}}
+</style>
+<!-- Google Analytics 4, on every page of the site.
+
+     Injected into the <head> of every built page by add_analytics() in
+     build_site.py, rather than pasted into the three hand-written pages and
+     the pandoc header. The version folders are finished HTML that is copied
+     across untouched, so a component the page has to include would miss
+     them; a pass over the finished site/ is the only place that reaches all
+     of them. G-PNWLMJLE50 is the measurement ID, filled in from GA_ID.
+
+     What GA4 counts by itself, once Enhanced measurement is on in the
+     property: page views, outbound clicks, file downloads, site search and
+     one scroll event at ninety per cent. None of that is repeated here. Its
+     video tracking only understands embedded YouTube, and the films on this
+     site are plain <video> elements served from the site itself, so the
+     watching is counted below. -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-PNWLMJLE50"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-PNWLMJLE50');
+</script>
+<script>
+(function () {
+  if (typeof gtag !== 'function') return;
+
+  /* What a report needs to name the thing that was watched or read. The
+     file name rather than the path, because the same film is reachable at
+     more than one URL and a report that splits it across them is no use. */
+  function assetName(el) {
+    var src = el.currentSrc || el.src || '';
+    if (!src) {
+      var s = el.querySelector && el.querySelector('source');
+      src = s ? s.getAttribute('src') : '';
+    }
+    return (src.split('/').pop() || 'unknown').replace(/\?.*$/, '');
+  }
+
+  function send(name, params) {
+    params = params || {};
+    params.page_path = location.pathname;
+    gtag('event', name, params);
+  }
+
+  /* The films and the audio. A play is easy to get and says little on its
+     own, since somebody who starts a film and leaves counts the same as
+     somebody who watches it through. So each player also reports the
+     quarters it passes, once each, and reaching the end. */
+  var MARKS = [25, 50, 75];
+  document.querySelectorAll('video, audio').forEach(function (m) {
+    var kind = m.tagName.toLowerCase();
+    var seen = {};
+
+    m.addEventListener('play', function () {
+      send('media_play', {asset: assetName(m), media_type: kind});
+    });
+
+    m.addEventListener('timeupdate', function () {
+      if (!m.duration || !isFinite(m.duration)) return;
+      var pct = (m.currentTime / m.duration) * 100;
+      MARKS.forEach(function (mark) {
+        if (pct >= mark && !seen[mark]) {
+          seen[mark] = true;
+          send('media_progress', {
+            asset: assetName(m), media_type: kind, percent: mark});
+        }
+      });
+    });
+
+    m.addEventListener('ended', function () {
+      send('media_complete', {asset: assetName(m), media_type: kind});
+    });
+  });
+
+  /* How far down a page anybody got. GA4's own scroll event fires once, at
+     ninety per cent, which cannot tell a page nobody finished from one
+     nobody started. Reported under its own name so the two do not mix. */
+  var depths = [25, 50, 75, 100], reached = {};
+  function scrolled() {
+    var doc = document.documentElement;
+    var height = doc.scrollHeight - window.innerHeight;
+    if (height <= 0) return;
+    var pct = ((window.scrollY || doc.scrollTop) / height) * 100;
+    depths.forEach(function (d) {
+      if (pct >= d && !reached[d]) {
+        reached[d] = true;
+        send('scroll_depth', {percent: d});
+      }
+    });
+  }
+  window.addEventListener('scroll', scrolled, {passive: true});
+  scrolled();
+
+  /* The controls the site draws itself: the full-screen button on every
+     page, and the speed and caption buttons under each film. Nothing
+     outside the site knows these were pressed. */
+  document.addEventListener('fullscreenchange', function () {
+    send(document.fullscreenElement ? 'fullscreen_enter' : 'fullscreen_exit');
+  });
+
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('.speed button');
+    if (!b) return;
+    if (b.classList.contains('cc')) send('captions_toggle');
+    else send('playback_speed', {speed: (b.textContent || '').trim()});
+  });
+})();
+</script>
+</head>
+<body>
+<button id="themeBtn" class="chip" type="button" aria-label="Switch theme"></button>
+<button id="fullscreenBtn" class="chip" type="button" title="Full screen"></button>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">MarsWorm &middot; V2 Earth microbes at work &middot; Exp 2</p>
+    <h1>Dry run: Experiment 2: how much perchlorate can an earthworm stand?</h1>
+    <p class="sub"><b>Nothing here is a result.</b> These numbers were invented by a script so the report could be checked before anybody runs the experiment.</p>
+    <p class="stamp">Written by the analysis, not by hand &middot; 2026-09-19 &middot; from ../data/simulated/breeding-stops</p>
+  </header>
+
+  <h2>What we found out</h2>
+  <p class="lede">Each question below was answered by the same rule, written down <em>before</em> anyone looked at the numbers, so a disappointing answer counts exactly as much as a good one.</p>
+  <div class="cards"><div class="card yes"><h3>Did any dose kill the worms outright?</h3><p class="call">No</p><p>Every box still held ten living worms at day 14.</p></div><div class="card no"><h3>At what dose did breeding stop?</h3><p class="call">250 millionths</p><p>At <b>250 millionths</b> the egg cases fell clear of the untreated boxes, with no overlap and a gap larger than the 5 cases we said in advance would count.</p></div><div class="card flat"><h3>Is there a dose that is clearly safe?</h3><p class="call">Up to 100 millionths</p><p>Boxes up to <b>100 millionths</b> could not be told apart from the untreated ones. That is the number the cleaning has to reach, and it is not a promise of safety, only a failure to see harm with three boxes.</p></div></div>
+  <h2>Where breeding gave way</h2>
+  <p class="lede">Two counts, drawn together. Worms that are alive are not the same as worms that are breeding, and the gap between these two lines is the whole reason this experiment exists.</p>
+  <figure><svg viewBox="0 0 920 320" role="img" aria-label="Survival holds up across every dose. Breeding does not, and breeding is the answer."><line x1="64" y1="278.0" x2="902" y2="278.0" stroke="var(--rule)" stroke-width="1"/><text x="56" y="282.0" text-anchor="end" font-size="11" fill="var(--ink-3)">0</text><line x1="64" y1="213.0" x2="902" y2="213.0" stroke="var(--rule)" stroke-width="1"/><text x="56" y="217.0" text-anchor="end" font-size="11" fill="var(--ink-3)">6.25</text><line x1="64" y1="148.0" x2="902" y2="148.0" stroke="var(--rule)" stroke-width="1"/><text x="56" y="152.0" text-anchor="end" font-size="11" fill="var(--ink-3)">12.5</text><line x1="64" y1="83.0" x2="902" y2="83.0" stroke="var(--rule)" stroke-width="1"/><text x="56" y="87.0" text-anchor="end" font-size="11" fill="var(--ink-3)">18.8</text><line x1="64" y1="18.0" x2="902" y2="18.0" stroke="var(--rule)" stroke-width="1"/><text x="56" y="22.0" text-anchor="end" font-size="11" fill="var(--ink-3)">25</text><text x="64.0" y="296.0" text-anchor="middle" font-size="11" fill="var(--ink-3)">0</text><text x="105.9" y="296.0" text-anchor="middle" font-size="11" fill="var(--ink-3)">50</text><text x="147.8" y="296.0" text-anchor="middle" font-size="11" fill="var(--ink-3)">100</text><text x="273.5" y="296.0" text-anchor="middle" font-size="11" fill="var(--ink-3)">250</text><text x="483.0" y="296.0" text-anchor="middle" font-size="11" fill="var(--ink-3)">500</text><text x="902.0" y="296.0" text-anchor="middle" font-size="11" fill="var(--ink-3)">1000</text><path d="M64.0,18.0 L105.9,45.7 L147.8,66.5 L273.5,205.2 L483.0,257.2 L902.0,278.0" fill="none" stroke="var(--e1)" stroke-width="2.5" stroke-linejoin="round"/><circle cx="64.0" cy="18.0" r="3.5" fill="var(--e1)"/><circle cx="105.9" cy="45.7" r="3.5" fill="var(--e1)"/><circle cx="147.8" cy="66.5" r="3.5" fill="var(--e1)"/><circle cx="273.5" cy="205.2" r="3.5" fill="var(--e1)"/><circle cx="483.0" cy="257.2" r="3.5" fill="var(--e1)"/><circle cx="902.0" cy="278.0" r="3.5" fill="var(--e1)"/><path d="M64.0,174.0 L105.9,174.0 L147.8,174.0 L273.5,174.0 L483.0,174.0 L902.0,174.0" fill="none" stroke="var(--e2)" stroke-width="2.5" stroke-linejoin="round"/><circle cx="64.0" cy="174.0" r="3.5" fill="var(--e2)"/><circle cx="105.9" cy="174.0" r="3.5" fill="var(--e2)"/><circle cx="147.8" cy="174.0" r="3.5" fill="var(--e2)"/><circle cx="273.5" cy="174.0" r="3.5" fill="var(--e2)"/><circle cx="483.0" cy="174.0" r="3.5" fill="var(--e2)"/><circle cx="902.0" cy="174.0" r="3.5" fill="var(--e2)"/><text x="64" y="18" font-size="11" fill="var(--ink-3)">count</text><text x="902" y="314" text-anchor="end" font-size="11" fill="var(--ink-3)">perchlorate, millionths by weight</text></svg><figcaption>Survival holds up across every dose. Breeding does not, and breeding is the answer.<br><span style="color:var(--e1)">&#9679;</span> egg cases at day 60 &middot; <span style="color:var(--e2)">&#9679;</span> live worms at day 14</figcaption></figure>
+  <h2>How each answer was worked out</h2>
+  <p class="lede">Every comparison was decided before the experiment started.</p>
+  <figure><div class="chart-scroll"><table class="grid"><thead><tr><th>Question</th><th>What was compared</th><th>Why</th></tr></thead><tbody><tr><td>Did any dose kill the worms outright?</td><td>survival</td><td>Every dose against the untreated boxes, counted at day 14. The published death threshold is around 2,000 millionths, well above the top dose here, so deaths would themselves be news.</td></tr><tr><td>At what dose did breeding stop?</td><td>eggs</td><td>Egg cases at day 60, each dose against the untreated boxes. This is the number the experiment exists for.</td></tr><tr><td>Is there a dose that is clearly safe?</td><td>safe</td><td>The highest dose whose egg cases still cannot be told apart from the untreated boxes. That is what the cleaning has to reach.</td></tr></tbody></table></div></figure>
+  <h2>Every dose, every box</h2>
+  <figure><div class="chart-scroll"><table class="grid"><thead><tr><th>Perchlorate, millionths by weight</th><th>Boxes</th><th>Live worms at day 14</th><th>Egg cases at day 60</th><th>Average egg cases</th></tr></thead><tbody><tr><td><b>none</b></td><td>3</td><td>10 to 10</td><td>24 to 26</td><td>25.0</td></tr><tr><td><b>50</b></td><td>3</td><td>10 to 10</td><td>20 to 25</td><td>22.3</td></tr><tr><td><b>100</b></td><td>3</td><td>10 to 10</td><td>19 to 22</td><td>20.3</td></tr><tr><td><b>250</b></td><td>3</td><td>10 to 10</td><td>6 to 8</td><td>7.0</td></tr><tr><td><b>500</b></td><td>3</td><td>10 to 10</td><td>1 to 3</td><td>2.0</td></tr><tr><td><b>1,000</b></td><td>3</td><td>10 to 10</td><td>0 to 0</td><td>0.0</td></tr></tbody></table></div></figure>
+  <h2>Was the data any good?</h2>
+  <p class="lede">These checks run before any answer is worked out. A report that cannot tell you what is missing should not be trusted about what is there.</p>
+  <div class="note warn"><b>Some checks failed, and the report says so rather than hiding it.</b><br><br>20 dampness checks found a box dried out. A dry box stops breeding for its own reasons, and that has to be said.</div>
+
+  <div class="end"><span>end of report</span></div>
+</div>
+
+<script>
+// ---- light / dark switch ----
+(function () {
+  const btn = document.getElementById("themeBtn");
+  const SUN = '<svg viewBox="0 0 24 24"><path d="M12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-13a1 1 0 0 1-1-1V1a1 1 0 0 1 2 0v2a1 1 0 0 1-1 1zm0 20a1 1 0 0 1-1-1v-2a1 1 0 0 1 2 0v2a1 1 0 0 1-1 1zM4 13H2a1 1 0 0 1 0-2h2a1 1 0 0 1 0 2zm18 0h-2a1 1 0 0 1 0-2h2a1 1 0 0 1 0 2zM5.6 6.99 4.2 5.58A1 1 0 0 1 5.61 4.17L7.02 5.58A1 1 0 1 1 5.6 6.99zm12.8 12.8-1.41-1.41a1 1 0 0 1 1.41-1.41l1.41 1.41a1 1 0 0 1-1.41 1.41zM6.99 18.4 5.58 19.8a1 1 0 0 1-1.41-1.41l1.41-1.41A1 1 0 1 1 6.99 18.4zM19.8 5.58 18.4 6.99a1 1 0 0 1-1.41-1.41L18.4 4.17a1 1 0 0 1 1.41 1.41z"/></svg>';
+  const MOON = '<svg viewBox="0 0 24 24"><path d="M12.3 22C6.6 22 2 17.4 2 11.7 2 6.9 5.3 2.8 9.9 1.7a1 1 0 0 1 1.1 1.5 7.6 7.6 0 0 0 9.7 10.6 1 1 0 0 1 1.3 1.3A10.3 10.3 0 0 1 12.3 22z"/></svg>';
+
+  // The page is light-first, so an unset theme means "whatever the OS says",
+  // and the OS default here is light.
+  const prefersDark = window.matchMedia
+    ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+
+  function current() {
+    const set = document.documentElement.getAttribute("data-theme");
+    if (set) return set;
+    return prefersDark && prefersDark.matches ? "dark" : "light";
+  }
+  function paint() {
+    const dark = current() === "dark";
+    btn.innerHTML = dark ? SUN : MOON;      // show what you will GET
+    btn.title = dark ? "Switch to light" : "Switch to dark";
+    btn.setAttribute("aria-label", btn.title);
+  }
+  btn.addEventListener("click", () => {
+    const next = current() === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    try { localStorage.setItem("marsworm-theme", next); } catch (e) {}
+    paint();
+  });
+  try {
+    const saved = localStorage.getItem("marsworm-theme");
+    if (saved) document.documentElement.setAttribute("data-theme", saved);
+  } catch (e) {}
+  if (prefersDark) prefersDark.addEventListener("change", paint);
+  paint();
+})();
+
+// ---- fullscreen toggle, YouTube-style ----
+(function () {
+  const btn = document.getElementById("fullscreenBtn");
+  const ENTER = '<svg viewBox="0 0 24 24"><path d="M3 3h6v2H5v4H3V3zm12 0h6v6h-2V5h-4V3zM3 15h2v4h4v2H3v-6zm16 4h-4v2h6v-6h-2v4z"/></svg>';
+  const EXIT  = '<svg viewBox="0 0 24 24"><path d="M5 16H3v5h5v-2H5v-3zm-2-8h2V5h3V3H3v5zm14 11h-3v2h5v-5h-2v3zM14 3v2h3v3h2V3h-5z"/></svg>';
+
+  function isFullscreen() {
+    return !!(document.fullscreenElement || document.webkitFullscreenElement ||
+              document.mozFullScreenElement || document.msFullscreenElement);
+  }
+  async function enter() {
+    const el = document.documentElement;
+    const req = el.requestFullscreen || el.webkitRequestFullscreen ||
+                el.mozRequestFullScreen || el.msRequestFullscreen;
+    if (req) await req.call(el);
+    // NOTE: no navigator.keyboard.lock() here, deliberately. The Mission Map
+    // locks Escape because it has popups that need to swallow the first press.
+    // This page has none, so locking Escape would only break the one thing
+    // everybody expects it to do -- leave fullscreen.
+  }
+  function exit() {
+    if (isFullscreen()) {
+      const ex = document.exitFullscreen || document.webkitExitFullscreen ||
+                 document.mozCancelFullScreen || document.msExitFullscreen;
+      if (ex) ex.call(document);
+    }
+  }
+  function paint() {
+    if (isFullscreen()) {
+      btn.innerHTML = EXIT;
+      btn.title = "Exit full screen";
+      btn.setAttribute("data-fullscreen", "true");
+    } else {
+      btn.innerHTML = ENTER + '<span class="fs-label">Full screen</span>';
+      btn.title = "Full screen";
+      btn.removeAttribute("data-fullscreen");
+    }
+  }
+  btn.addEventListener("click", () => {
+    isFullscreen() ? exit() : enter();
+    btn.blur();          // otherwise the ring lingers and reads as "active"
+  });
+  ["fullscreenchange", "webkitfullscreenchange", "mozfullscreenchange",
+   "MSFullscreenChange"].forEach(ev => document.addEventListener(ev, paint));
+  paint();
+})();
+</script>
+</body>
+</html>
